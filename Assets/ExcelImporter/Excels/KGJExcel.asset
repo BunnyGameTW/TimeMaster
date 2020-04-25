@@ -1,0 +1,239 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 8
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5325ef2b9e3e12f4bbb4b85642bc97aa, type: 3}
+  m_Name: KGJExcel
+  m_EditorClassIdentifier: 
+  cardTable:
+  - id: 1
+    type: 0
+    description: "\u6211\u611B\u4F60"
+    fileName: 0
+  - id: 2
+    type: 0
+    description: "\u6211\u8981\u53BB\u6D17\u6FA1\u4E86"
+    fileName: 0
+  - id: 3
+    type: 0
+    description: "\u525B\u8D77\u5E8A"
+    fileName: 0
+  - id: 4
+    type: 1
+    description: "\u72D7\u72D7"
+    fileName: dog
+  - id: 5
+    type: 0
+    description: "\u525B\u525B\u5728\u8DDF\u7D93\u7D00\u4EBA\u8A0E\u8AD6\u4E8B\u60C5"
+    fileName: 0
+  - id: 6
+    type: 0
+    description: "\u525B\u525B\u5728\u8DDF\u7D93\u7D00\u4EBA\u8A0E\u8AD6\u4E8B\u60C52"
+    fileName: 0
+  - id: 7
+    type: 0
+    description: "\u525B\u525B\u5728\u8DDF\u7D93\u7D00\u4EBA\u8A0E\u8AD6\u4E8B\u60C53"
+    fileName: 0
+  womenQuestionTable1:
+  - id: 1
+    type: 0
+    description: "\u4F60\u5728\u505A\u4EC0\u9EBC"
+    cardsId: 1,2,3,4
+    cardId: 
+  - id: 2
+    type: 0
+    description: "\u4F60\u73FE\u5728\u5728\u54EA\u88E1"
+    cardsId: 1,2,3,4
+    cardId: 
+  - id: 3
+    type: 0
+    description: "\u4F60\u4ECA\u5929\u5728\u505A\u4EC0\u9EBC"
+    cardsId: 1,2,3,4
+    cardId: 
+  - id: 4
+    type: 1
+    description: "\u6211\u770B\u5230\u4F60\u5E6B%s\u8CBC\u6587\u6309\u8B9A\uFF0C\u662F\u600E\u9EBC\u56DE\u4E8B"
+    cardsId: 1,2
+    cardId: 
+  - id: 5
+    type: 1
+    description: "\u6211\u807D\u5230%s\u8AAA\u805A\u6703\u770B\u5230\u4F60\u8DDF%s\u5728\u4E00\u8D77\u7684\u756B\u9762\uFF0C\u662F\u771F\u7684\u55CE"
+    cardsId: 1,2
+    cardId: 
+  - id: 6
+    type: 2
+    description: "\u70BA\u4EC0\u9EBC\u4E0D\u56DE\u6211\u8A0A\u606F"
+    cardsId: 5,6,7
+    cardId: 
+  - id: 7
+    type: 2
+    description: "\u70BA\u4EC0\u9EBC\u4E0D\u56DE\u6211\u8A0A\u606F2"
+    cardsId: 5,6,7
+    cardId: 
+  - id: 8
+    type: 3
+    description: "\u4E0A\u6B21\u4F60\u8AAA\u8981\u9001\u6211\u79AE\u7269\uFF0C\u9084\u8A18\u5F97\u55CE"
+    cardsId: 1,2
+    cardId: 
+  womenResponseTable1:
+  - id: 1
+    cardId: 1
+    description: "\u6211\u4E5F\u611B\u4F60"
+    hasMuitipleLine: 0
+    hasMultipleQuestion: 0
+    nexQuestionId: 0
+    cdTime: 10
+    addScore: -10
+  - id: 2
+    cardId: 2
+    description: "\u597D\u5594\uFF0C\u7B49\u7B49\u804A"
+    hasMuitipleLine: 0
+    hasMultipleQuestion: 0
+    nexQuestionId: 0
+    cdTime: 5
+    addScore: 10
+  - id: 3
+    cardId: 3
+    description: "\u592A\u967D\u66EC\u5C41\u80A1\u4E86\n\u592A\u967D\u66EC\u5C41\u80A1\u4E862\n\u592A\u967D\u66EC\u5C41\u80A1\u4E863"
+    hasMuitipleLine: 1
+    hasMultipleQuestion: 1
+    nexQuestionId: 8
+    cdTime: 0
+    addScore: 0
+  - id: 4
+    cardId: 4
+    description: "\u597D\u53EF\u611B\u7684\u72D7\u72D7\uFF0C\u8CB7\u7D66\u6211"
+    hasMuitipleLine: 0
+    hasMultipleQuestion: 1
+    nexQuestionId: 8
+    cdTime: 0
+    addScore: 0
+  - id: 5
+    cardId: 5
+    description: "\u597D\u5427"
+    hasMuitipleLine: 0
+    hasMultipleQuestion: 0
+    nexQuestionId: 0
+    cdTime: 0
+    addScore: 0
+  - id: 6
+    cardId: 6
+    description: "\u597D\u54272"
+    hasMuitipleLine: 0
+    hasMultipleQuestion: 0
+    nexQuestionId: 0
+    cdTime: 0
+    addScore: 0
+  - id: 7
+    cardId: 7
+    description: "\u597D\u54273"
+    hasMuitipleLine: 0
+    hasMultipleQuestion: 0
+    nexQuestionId: 0
+    cdTime: 0
+    addScore: 0
+  womenQuestionTable2:
+  - id: 1
+    type: 0
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u4F60\u5728\u505A\u4EC0\u9EBC"
+    cardsId: 1,2,3,4
+    cardId: 
+  - id: 2
+    type: 0
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u4F60\u73FE\u5728\u5728\u54EA\u88E1"
+    cardsId: 1,2,3,4
+    cardId: 
+  - id: 3
+    type: 0
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u4F60\u4ECA\u5929\u5728\u505A\u4EC0\u9EBC"
+    cardsId: 1,2,3,4
+    cardId: 
+  - id: 4
+    type: 1
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u6211\u770B\u5230\u4F60\u5E6B%s\u8CBC\u6587\u6309\u8B9A\uFF0C\u662F\u600E\u9EBC\u56DE\u4E8B"
+    cardsId: 1,2
+    cardId: 
+  - id: 5
+    type: 1
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u6211\u807D\u5230%s\u8AAA\u805A\u6703\u770B\u5230\u4F60\u8DDF%s\u5728\u4E00\u8D77\u7684\u756B\u9762\uFF0C\u662F\u771F\u7684\u55CE"
+    cardsId: 1,2
+    cardId: 
+  - id: 6
+    type: 2
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u70BA\u4EC0\u9EBC\u4E0D\u56DE\u6211\u8A0A\u606F"
+    cardsId: 5,6,7
+    cardId: 
+  - id: 7
+    type: 2
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u70BA\u4EC0\u9EBC\u4E0D\u56DE\u6211\u8A0A\u606F2"
+    cardsId: 5,6,7
+    cardId: 
+  - id: 8
+    type: 3
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u4E0A\u6B21\u4F60\u8AAA\u8981\u9001\u6211\u79AE\u7269\uFF0C\u9084\u8A18\u5F97\u55CE"
+    cardsId: 1,2
+    cardId: 
+  womenResponseTable2:
+  - id: 1
+    cardId: 1
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u6211\u4E5F\u611B\u4F60"
+    hasMuitipleLine: 0
+    hasMultipleQuestion: 0
+    nexQuestionId: 0
+    cdTime: 10
+    addScore: -10
+  - id: 2
+    cardId: 2
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u597D\u5594\uFF0C\u7B49\u7B49\u804A"
+    hasMuitipleLine: 0
+    hasMultipleQuestion: 0
+    nexQuestionId: 0
+    cdTime: 5
+    addScore: 10
+  - id: 3
+    cardId: 3
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u592A\u967D\u66EC\u5C41\u80A1\u4E86\n\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u592A\u967D\u66EC\u5C41\u80A1\u4E862\n\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u592A\u967D\u66EC\u5C41\u80A1\u4E863"
+    hasMuitipleLine: 1
+    hasMultipleQuestion: 1
+    nexQuestionId: 8
+    cdTime: 0
+    addScore: 0
+  - id: 4
+    cardId: 4
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u597D\u53EF\u611B\u7684\u72D7\u72D7\uFF0C\u8CB7\u7D66\u6211"
+    hasMuitipleLine: 0
+    hasMultipleQuestion: 1
+    nexQuestionId: 8
+    cdTime: 0
+    addScore: 0
+  - id: 5
+    cardId: 5
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u597D\u5427"
+    hasMuitipleLine: 0
+    hasMultipleQuestion: 0
+    nexQuestionId: 0
+    cdTime: 0
+    addScore: 0
+  - id: 6
+    cardId: 6
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u597D\u54272"
+    hasMuitipleLine: 0
+    hasMultipleQuestion: 0
+    nexQuestionId: 0
+    cdTime: 0
+    addScore: 0
+  - id: 7
+    cardId: 7
+    description: "\u6211\u662F\u4E8C\u865F\u5973\u4EBA\uFF0C\u597D\u54273"
+    hasMuitipleLine: 0
+    hasMultipleQuestion: 0
+    nexQuestionId: 0
+    cdTime: 0
+    addScore: 0
