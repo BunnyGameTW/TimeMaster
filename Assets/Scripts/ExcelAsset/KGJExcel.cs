@@ -11,5 +11,7 @@ public class KGJExcel : ScriptableObject
     public List<WomenResponse> womenResponseTable1;
     public List<WomenQuestion> womenQuestionTable2;
     public List<WomenResponse> womenResponseTable2;
- 
+    public List<WomenInfo> womenTable;
+
+
 }

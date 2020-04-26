@@ -237,3 +237,34 @@ MonoBehaviour:
     nexQuestionId: 0
     cdTime: 0
     addScore: 0
+  womenTable:
+  - id: 1
+    name: "\u6EAB\u67D4\u5973\u4EBA"
+    personality: "\u6EAB\u67D4"
+    job: "\u77E5\u540D\u6B4C\u624B"
+    state: "\u6700\u65B0\u5C08\u8F2F\u71B1\u8CE3\u4E2D\uFF0C\u8ACB\u5927\u5BB6\u591A\u591A\u652F\u6301"
+    fileName: women_1
+  - id: 2
+    name: "\u6D3B\u6F51\u5973\u4EBA"
+    personality: "\u6D3B\u6F51"
+    job: "\u5B78\u751FJK"
+    state: "\u597D\u7121\u804A\u554A~"
+    fileName: women_2
+  - id: 3
+    name: "\u51B7\u975C\u5973\u4EBA"
+    personality: "\u51B7\u975C"
+    job: 0
+    state: "\u72C0\u614B3"
+    fileName: women_3
+  - id: 4
+    name: "\u706B\u7206\u5973\u4EBA"
+    personality: "\u706B\u7206"
+    job: 0
+    state: "\u72C0\u614B4"
+    fileName: women_1
+  - id: 5
+    name: "\u50B2\u5B0C\u5973\u4EBA"
+    personality: "\u50B2\u5B0C"
+    job: 0
+    state: "\u72C0\u614B5"
+    fileName: women_1
