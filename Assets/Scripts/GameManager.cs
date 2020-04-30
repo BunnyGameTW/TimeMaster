@@ -19,7 +19,7 @@ public struct NavData
 
 public class GameManager : MonoBehaviour
 {
-	[SerializeField] KGJExcel excelData;
+    [SerializeField] KGJExcel excelData;
     public GameObject cardPrefab, friendCellPrefab, chatCellPrefab, roomGirlPrefab, roomMeTextPrefab, roomMeImagePrefab;
     public GameObject navCellPrefab;
     public Transform cardObjectTransform;
@@ -49,9 +49,8 @@ public class GameManager : MonoBehaviour
 
     float CARD_TOTAL_WIDTH;
 
-    List<WomenQuestion>[] womenQuestionDatas;
-    List<WomenResponse>[] womenResponseDatas;
     List<Card> cardData;
+
     enum State
     {
         FRIEND, CHAT, ROOM, SETTING
@@ -70,37 +69,55 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        InitWomenQuestionDatas();
-        InitWomenResponseDatas();
-        InitFormatCardId();
         gameState = State.FRIEND;
         cardData = excelData.cardTable;
         randomCardList = new List<Card>();
+
         InitPlayerCards();
         InitScrollViewDictionary();
         InitTitleDictionary();
         InitNavBar();
         InitMeInfo();
+
         InitFriendList();
         //InitChatList();
         InitWomenList();
         CARD_TOTAL_WIDTH = Screen.width -
             playerCards[0].gameObject.GetComponentInChildren<RectTransform>().sizeDelta.x - CARD_PADDING * 2;
 
-       
         SwitchState();
     }
 
     void InitWomenList()
     {
         womenList = new List<WomenBehavior>();
-        for (int i = 0; i < excelData.womenTable.Count; i++)
+        for (int i = 0; i < excelData.womenTable.Count; i++)//TODO excelData.womenTable.Count
         {
-            WomenBehavior women = Instantiate(womenPrefab).GetComponent<WomenBehavior>();
-            women.SetData(excelData.womenTable[i], womenQuestionDatas[i], womenResponseDatas[i]);
-            women.showMessageEvent += OnShowMessageEvent;
-            womenList.Add(women);
+            if (i == 0)//TODO removed
+            {
+                WomenBehavior women = Instantiate(womenPrefab).GetComponent<WomenBehavior>();
+                women.SetData(
+                    excelData.womenTable[i],
+                    excelData.questionTable,
+                    excelData.responseTable,
+                    GetWomenMatchData(excelData.womenTable[i].id));
+                women.showMessageEvent += OnShowMessageEvent;
+                womenList.Add(women);
+            }
         }
+    }
+
+    List<MatchInfo> GetWomenMatchData(int id)
+    {
+        List<MatchInfo> matchData = new List<MatchInfo>();
+        for (int i = 0; i < excelData.matchTable.Count; i++)
+        {
+            if (excelData.matchTable[i].womenId == id)
+            {
+                matchData.Add(excelData.matchTable[i]);
+            }
+        }
+        return matchData;
     }
 
     void InitMeInfo()
@@ -150,12 +167,12 @@ public class GameManager : MonoBehaviour
         cell.GetComponent<NavCellBehavior>().clickEvent += OnNavCellClickEvent;
         return cell;
     }
-   
+
     void InitTitleDictionary()
     {
         titleTextDictionary = new Dictionary<State, string>();
         titleTextDictionary.Add(State.CHAT, CHAT_TITLE);
-        titleTextDictionary.Add(State.ROOM, ROOM_TITLE);//TODO
+        titleTextDictionary.Add(State.ROOM, ROOM_TITLE);
         titleTextDictionary.Add(State.FRIEND, FIREND_TITLE);
         titleTextDictionary.Add(State.SETTING, SETTING_TITLE);
     }
@@ -165,7 +182,7 @@ public class GameManager : MonoBehaviour
         string title = titleTextDictionary[gameState];
         if (gameState == State.ROOM)
         {
-            title = friendList[womenIndex - 1].GetComponent<FriendCellBehavior>().GetData().name;
+            title = GetTalkWomen().GetData().name;
         }
         titleObject.GetComponentInChildren<Text>().text = title;
     }
@@ -191,53 +208,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    Card RandomGetCard()
-    {
-        if(randomCardList.Count == 0)
-        {
-            for (int i = 0; i < cardData.Count; i++)
-            {
-                randomCardList.Add(cardData[i]);
-            }
-        }
-        int index = UnityEngine.Random.Range(0, randomCardList.Count);
-        Card randomCard = randomCardList[index];
-        randomCardList.RemoveAt(index);
-        return randomCard;
-    }
-
-    void InitWomenQuestionDatas()
-    {
-        womenQuestionDatas = new List<WomenQuestion>[WOMEN_NUMBER] {
-            excelData.womenQuestionTable1,
-            excelData.womenQuestionTable2
-        };
-    }
-
-    void InitWomenResponseDatas()
-    {
-        womenResponseDatas = new List<WomenResponse>[WOMEN_NUMBER] {
-            excelData.womenResponseTable1,
-            excelData.womenResponseTable2
-        };
-    }
-
     //format women accept card id
-    void InitFormatCardId()
-    {
-        for (int i = 0; i < womenQuestionDatas.Length; i++)
-        {
-            foreach (var item in womenQuestionDatas[i])
-            {
-                string[] strs = item.cardsId.Split(FORMAT_ACCEPT_CARD_CHARACTER);
-                item.cardId = new int [strs.Length];
-                for (int j = 0; j < strs.Length; j++)
-                {
-                    item.cardId[j] = Convert.ToInt32(strs[j]);
-                }
-            }
-        }
-    }
+    //void InitFormatCardId()
+    //{
+    //    for (int i = 0; i < womenQuestionDatas.Length; i++)
+    //    {
+    //        foreach (var item in womenQuestionDatas[i])
+    //        {
+    //            string[] strs = item.cardsId.Split(FORMAT_ACCEPT_CARD_CHARACTER);
+    //            item.cardId = new int [strs.Length];
+    //            for (int j = 0; j < strs.Length; j++)
+    //            {
+    //                item.cardId[j] = Convert.ToInt32(strs[j]);
+    //            }
+    //        }
+    //    }
+    //}
 
     void SwitchState()
     {
@@ -248,9 +234,9 @@ public class GameManager : MonoBehaviour
             case State.CHAT:
                 break;
             case State.ROOM:
-                //float score = womenList[womenIndex - 1].GetData().score;
-                //roomObject.GetComponentInChildren<Text>().text = score.ToString();
-                //roomObject.GetComponentInChildren<Image>().fillAmount = score / MAX_SCORE;
+                float score = GetTalkWomen().GetScore();
+                roomObject.GetComponentInChildren<Text>().text = score.ToString();
+                roomObject.GetComponentInChildren<Image>().fillAmount = score / MAX_SCORE;
                 break;
             default:
                 break;
@@ -268,21 +254,42 @@ public class GameManager : MonoBehaviour
         roomObject.SetActive(gameState == State.ROOM);
     }
 
-    GameObject GetCard()
+    //TODO 機率
+    Card GetRandomCardData()
     {
-        Card cardData = RandomGetCard();
-        GameObject gameObjectCard = Instantiate(cardPrefab, Vector3.zero, Quaternion.identity, cardObjectTransform);
-        SetCard(cardData, gameObjectCard);
-        return gameObjectCard;
+        if (randomCardList.Count == 0)
+        {
+            for (int i = 0; i < cardData.Count; i++)
+            {
+                randomCardList.Add(cardData[i]);
+            }
+        }
+        int index = UnityEngine.Random.Range(0, randomCardList.Count);
+        Card randomCard = randomCardList[index];
+        randomCardList.RemoveAt(index);
+        return randomCard;
     }
 
-    void AddCard()
+    Card GetCardData(int id)
     {
-        GameObject gameObjectCard = GetCard();
-        playerCards.Add(gameObjectCard);
-        gameObjectCard.GetComponent<CardBehavior>().playCardEvent += OnPlayCardEvent;
-        gameObjectCard.GetComponent<CardBehavior>().pointerEnterEvent += OnCardEnterEvent;
-        gameObjectCard.GetComponent<CardBehavior>().pointerExitEvent += OnCardExitEvent;
+        foreach (Card item in cardData)
+        {
+            if (item.id == id)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    GameObject GetCard()
+    {
+        GameObject gameObject = Instantiate(cardPrefab, Vector3.zero, Quaternion.identity, cardObjectTransform);
+        gameObject.GetComponent<CardBehavior>().SetData(GetRandomCardData());
+        gameObject.GetComponent<CardBehavior>().playCardEvent += OnPlayCardEvent;
+        gameObject.GetComponent<CardBehavior>().pointerEnterEvent += OnCardEnterEvent;
+        gameObject.GetComponent<CardBehavior>().pointerExitEvent += OnCardExitEvent;
+        return gameObject;
     }
 
     void InitPlayerCards()
@@ -290,8 +297,17 @@ public class GameManager : MonoBehaviour
         playerCards = new List<GameObject>();
         for (int i = 0; i < START_CARD_NUMBER; i++)
         {
-            AddCard();
+            playerCards.Add(GetCard());
         }
+    }
+
+    void DeleteCard(CardBehavior card)
+    {
+        card.playCardEvent -= OnPlayCardEvent;
+        card.pointerEnterEvent -= OnCardEnterEvent;
+        card.pointerExitEvent -= OnCardExitEvent;
+        Destroy(card.gameObject);
+        playerCards.Remove(card.gameObject);
     }
 
     //event
@@ -300,26 +316,14 @@ public class GameManager : MonoBehaviour
         Card cardData = param.cardData;
         Debug.Log(cardData.description);
         Debug.Log(cardData.id);
-        //TODO show message
 
-        womenList[womenIndex - 1].AddCard(cardData);
+        GetTalkWomen().AddMessage(cardData.id, MessageType.Player);
+        GetTalkWomen().OnPlayCardEvent(cardData);
 
-        CardBehavior cardModel = (CardBehavior)sender;
-        for (int i = 0; i < playerCards.Count; i++)
-        {
-            CardBehavior cardBehavior = playerCards[i].GetComponent<CardBehavior>();
-            if (cardBehavior == cardModel)
-            {
-                cardBehavior.playCardEvent -= OnPlayCardEvent;
-                cardBehavior.pointerEnterEvent += OnCardEnterEvent;
-                cardBehavior.pointerExitEvent += OnCardExitEvent;
-                Destroy(playerCards[i]);
-                playerCards.RemoveAt(i);
-            }
-        }
-        AddCard();
+        //get new card
+        DeleteCard((CardBehavior)sender);
+        playerCards.Add(GetCard());
         UpdatePlayerCards();
-        //TODO girl behavior
     }
 
     void OnCardEnterEvent(object sender, CardEventArgs param)
@@ -338,7 +342,7 @@ public class GameManager : MonoBehaviour
         NavCellBehavior navCell = (NavCellBehavior)sender;
         foreach (KeyValuePair<State, GameObject> pair in navCellDictionary)
         {
-            if(pair.Value == navCell.gameObject)
+            if (pair.Value == navCell.gameObject)
             {
                 gameState = pair.Key;
             }
@@ -356,9 +360,155 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void OnShowMessageEvent(object sender, EventArgs param)
+    void OnShowMessageEvent(object sender, MessageEvenArgs param)
     {
-        //TODO type women or player
+        WomenBehavior women = (WomenBehavior)sender;
+        if (women.GetData().id == womenIndex)
+        {
+            ShowInRoomMessage(param.message.type, param.message.id);
+        }
+        else
+        {
+            //TODO show in alert
+            string[] messages = param.message.type == MessageType.WomenQuestion ?
+              GetQuestionMessageString(param.message.id) : GetResponseMessageString(param.message.id);
+            for (int i = 0; i < messages.Length; i++)
+            {
+                Debug.Log("show alert:" + women.GetData().name + "-> " + messages[i]);
+            }
+            women.AddUnreadMessage(param.message);
+        }
+
+    }
+
+    List<WomenInfo> GetNotIncludedWomenInfo(int id)
+    {
+        List<WomenInfo> list = new List<WomenInfo>();
+        foreach (WomenInfo item in excelData.womenTable)
+        {
+            if(item.id != id)
+            {
+                list.Add(item);
+            }
+        }
+        return list;
+    }
+
+
+    string [] GetQuestionMessageString(int id)
+    {
+        WomenQuestion q = GetQuestionData(id);
+        string str = q.description;
+
+        //List<WomenInfo> list = GetNotIncludedWomenInfo(GetTalkWomen().GetData().id);
+        //for (int i = 0; i < q.formatNumber; i++)
+        //{
+        //    int index = UnityEngine.Random.Range(0, list.Count);
+        //    str = string.Format(str, list[index].name);
+        //    //TODO 格式化人名要記下來
+
+        //    list.RemoveAt(index);
+        //}
+        Debug.Log("after format->" + str);
+        
+        if (q.hasMuitipleLine)
+        {
+            Debug.Log("has multiple line");
+            return str.Split('\n');
+        }
+        string[] strs = new string[1];
+        strs[0] = str;
+        return strs;
+    }
+
+    WomenResponse GetResponseData(int id)
+    {
+        foreach (WomenResponse item in excelData.responseTable)
+        {
+            if(item.id == id)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    string[] GetResponseMessageString(int id)
+    {
+        WomenResponse r = GetResponseData(id);
+        string str = r.description;
+        if (r.hasMuitipleLine)
+        {
+            Debug.Log("has multiple line");
+            return str.Split('\n');
+        }
+        string[] strs = new string[1];
+        strs[0] = str;
+        return strs;
+    }
+
+    WomenBehavior GetTalkWomen()
+    {
+        return womenList[womenIndex - 1];
+    }
+
+    void ShowInRoomMessage(MessageType type, int id)
+    {
+        if (type == MessageType.Player)
+        {
+            Card card = GetCardData(id);
+            Transform parent = scrollViewDictionary[State.ROOM].GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
+            if(card.type == CardType.Text)
+            {
+                GameObject gameObject = Instantiate(roomMeTextPrefab, parent);
+                gameObject.GetComponentInChildren<Text>().text = card.description;
+            }
+            else
+            {
+                GameObject gameObject = Instantiate(roomMeImagePrefab, parent);
+                gameObject.GetComponentsInChildren<Image>()[1].sprite = Resources.Load<Sprite>(card.fileName);
+            }
+            StartCoroutine(AutoScroll());
+        }
+        else
+        {
+            string[] messages = type == MessageType.WomenQuestion ? 
+                GetQuestionMessageString(id) : GetResponseMessageString(id);
+            for (int i = 0; i < messages.Length; i++)
+            {
+                AddWomenMessage(messages[i]);
+            }
+        }
+    }
+
+    void AddWomenMessage(string text)
+    {
+        Transform parent = scrollViewDictionary[State.ROOM].GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
+        GameObject gameObject = Instantiate(roomGirlPrefab, parent);
+        gameObject.GetComponentInChildren<Text>().text = text;
+        gameObject.GetComponentsInChildren<Image>()[1].sprite = Resources.Load<Sprite>(GetTalkWomen().GetData().fileName);
+        StartCoroutine(AutoScroll());
+    }
+ 
+    private IEnumerator AutoScroll()
+    {
+        RectTransform parent = scrollViewDictionary[State.ROOM].GetComponentInChildren<ContentSizeFitter>().gameObject.GetComponent<RectTransform>();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(parent);
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+        scrollViewDictionary[State.ROOM].GetComponentInChildren<ScrollRect>().verticalNormalizedPosition = 0;
+    }
+
+    WomenQuestion GetQuestionData(int id)
+    {
+        foreach (WomenQuestion item in excelData.questionTable)
+        {
+            if(item.id == id)
+            {
+                return item;
+            }
+        }
+        return null;
     }
 
     public void OnBackButtonClicked()
@@ -367,28 +517,26 @@ public class GameManager : MonoBehaviour
         SwitchState();
     }
 
-  
-
     void UpdateNavBar()
     {
+        if (gameState == State.ROOM)
+        {
+            return;
+        }
+
         foreach (KeyValuePair<State, GameObject> pair in navCellDictionary)
         {
             pair.Value.transform.localScale = new Vector3(1, 1, 1);
             pair.Value.GetComponentInChildren<Image>().color = Color.gray;
             pair.Value.GetComponentInChildren<Text>().color = Color.gray;
         }
-        if (gameState == State.ROOM)
-            return;
+     
         GameObject gameObject = navCellDictionary[gameState];
         gameObject.transform.localScale = new Vector3(NAV_ICON_SCALE_RATIO, NAV_ICON_SCALE_RATIO, 1);
         gameObject.GetComponentInChildren<Image>().color = Color.white;
         gameObject.GetComponentInChildren<Text>().color = Color.white;
     }
 
-    void SetCard(Card cardData, GameObject gameObject)
-    {
-        gameObject.GetComponent<CardBehavior>().SetData(cardData);
-    }
 
     void UpdatePlayerCards()
     {
@@ -399,6 +547,7 @@ public class GameManager : MonoBehaviour
             float offset = CARD_TOTAL_WIDTH / playerCards.Count;
             playerCards[i].transform.localPosition = new Vector3((i - mid) * offset, CARD_START_POSITION_Y, 0);
         }
+
         //z order
         for (int i = 0; i < playerCards.Count; i++)
         {

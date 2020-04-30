@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
+﻿using System;
 
 [Serializable]
 public class WomenQuestion
@@ -9,11 +6,11 @@ public class WomenQuestion
     public int id;
     public WomenQuestionType type;
     public string description;
-    public string cardsId;
-    public int[] cardId;
+    public int formatNumber;
+    public bool hasMuitipleLine;
 }
 
 public enum WomenQuestionType
 {
-    Start,Query,Idle,Normal    
+    Start,Query,Normal    
 }

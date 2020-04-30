@@ -6,12 +6,9 @@ using UnityEngine;
 [ExcelAsset]
 public class KGJExcel : ScriptableObject
 {
-    public List<Card> cardTable; 
-    public List<WomenQuestion> womenQuestionTable1;
-    public List<WomenResponse> womenResponseTable1;
-    public List<WomenQuestion> womenQuestionTable2;
-    public List<WomenResponse> womenResponseTable2;
-    public List<WomenInfo> womenTable;
-
-
+    public List<MatchInfo> matchTable; // Replace 'EntityType' to an actual type that is serializable.
+    public List<WomenQuestion> questionTable; // Replace 'EntityType' to an actual type that is serializable.
+    public List<Card> cardTable; // Replace 'EntityType' to an actual type that is serializable.
+    public List<WomenResponse> responseTable; // Replace 'EntityType' to an actual type that is serializable.
+    public List<WomenInfo> womenTable; // Replace 'EntityType' to an actual type that is serializable.
 }
