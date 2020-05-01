@@ -135,9 +135,9 @@ public class WomenBehavior : MonoBehaviour
         MatchInfo info = GetMatchResponse(card);
         if (info != null)
         {
-            AddMessage(info.responseId, MessageType.WomenResponse);
             AddScore(info.addScore);
             AddCoolDownTime(info.cdTime);
+            AddMessage(info.responseId, MessageType.WomenResponse);
             if (info.hasMultipleQuestion)
             {
                 AskQuestion(info.nextQuestionId);
@@ -146,8 +146,8 @@ public class WomenBehavior : MonoBehaviour
         else
         {
             int responseId = wrongResponseIdList[UnityEngine.Random.Range(0, wrongResponseIdList.Count)];
-            AddMessage(responseId, MessageType.WomenResponse);
             AddScore(WRONG_ANSWER_SCORE);
+            AddMessage(responseId, MessageType.WomenResponse);
         }
 
     }
@@ -160,13 +160,10 @@ public class WomenBehavior : MonoBehaviour
             WomenQuestion q = GetQuestionData(item.questionId);
             if (q.type == WomenQuestionType.Start && !startQuestionIdList.Contains(item.questionId))
             {
-                Debug.Log("startQuestionIdList.Ad");
                 startQuestionIdList.Add(item.questionId);
             }
             else if (q.type != WomenQuestionType.Start && !randomQuestionList.Contains(item.questionId))
             {
-                Debug.Log("randomQuestionList.Ad");
-
                 randomQuestionList.Add(item.questionId);
             }
         }
@@ -237,9 +234,8 @@ public class WomenBehavior : MonoBehaviour
 
     void AskQuestion(int id)
     {
-        int index = randomQuestionList[UnityEngine.Random.Range(0, randomQuestionList.Count)];
-        questionId = index;
-        AddMessage(index, MessageType.WomenQuestion);
+        questionId = id;
+        AddMessage(id, MessageType.WomenQuestion);
         questionCounter++;
     }
 
@@ -268,8 +264,8 @@ public class WomenBehavior : MonoBehaviour
     {
         if (timer > RANDOM_START_TIME && questionCounter == 0)
         {
-            AskStartQuestion();
             hasAskQuestion = true;
+            AskStartQuestion();
         }
         else if (timer > ASK_QUESTION_TIME)
         {

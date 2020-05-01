@@ -17,8 +17,12 @@ public class CardBehavior : MonoBehaviour
     const float MOVE_OFFSET_Y = 100.0f;
     const float PLAY_CARD_POSITION_Y = 0;
     const float SCALE_RATIO = 1.5f;
+
     Card data;
     bool hasPointerDown, hasPointerEnter;
+    bool canUse;
+    Image backgroundImage;
+    Vector3 originalPosition;
 
     public event EventHandler<CardEventArgs> playCardEvent;
     public event EventHandler<CardEventArgs> pointerEnterEvent;
@@ -28,12 +32,22 @@ public class CardBehavior : MonoBehaviour
     void Start()
     {
         hasPointerDown = hasPointerEnter = false;
+        backgroundImage = GetComponentsInChildren<Image>()[0];
+        originalPosition = transform.localPosition;
+        SetCanUse(false);
     }
 
-    // Update is called once per frame
-    void Update()
+
+    public void SetCanUse(bool boolean)
     {
-        
+        canUse = boolean;
+        backgroundImage.color = boolean ? Color.white : Color.gray;
+    }
+
+    public void UpdatePosition(Vector3 position)
+    {
+        transform.localPosition = position;
+        originalPosition = transform.localPosition;
     }
 
     void UpdateUI()
@@ -51,51 +65,65 @@ public class CardBehavior : MonoBehaviour
     {
         data = cardData;
         UpdateUI();
-      
     }
 
     public void OnPointerEnter()
     {
-        transform.localScale *= SCALE_RATIO;
-        transform.localPosition += new Vector3(0, MOVE_OFFSET_Y, 0);
-        hasPointerEnter = true;
-        pointerEnterEvent?.Invoke(this, new CardEventArgs());
+        if (canUse)
+        {
+            transform.localScale = new Vector3(SCALE_RATIO, SCALE_RATIO);
+            transform.localPosition = originalPosition + new Vector3(0, MOVE_OFFSET_Y, 0);
+            hasPointerEnter = true;
+            pointerEnterEvent?.Invoke(this, new CardEventArgs());
+        }
     }
 
     public void OnPointerExit()
     {
-        gameObject.transform.localScale /= SCALE_RATIO;
-        gameObject.transform.localPosition -= new Vector3(0, MOVE_OFFSET_Y, 0);
-        hasPointerEnter = false;
-        pointerExitEvent?.Invoke(this, new CardEventArgs());
+        if (canUse)
+        {
+            gameObject.transform.localScale = new Vector3(1.0f, 1.0f);
+            gameObject.transform.localPosition = originalPosition;
+            hasPointerEnter = false;
+            pointerExitEvent?.Invoke(this, new CardEventArgs());
+        }
     }
 
     public void OnPointerDown()
     {
-        hasPointerDown = true;
+        if (canUse)
+        {
+            hasPointerDown = true;
+        }
     }
 
     public void OnPointerDrag()
     {
-        if (hasPointerDown)
+        if (canUse)
         {
-            transform.position = Input.mousePosition;
+            if (hasPointerDown)
+            {
+                transform.position = Input.mousePosition;
+            }
         }
     }
 
     public void OnPointerUp()
     {
-        if(transform.localPosition.y > PLAY_CARD_POSITION_Y && hasPointerDown && hasPointerEnter)
+        if (canUse)
         {
-            CardEventArgs param = new CardEventArgs();
-            param.cardData = data;
-            playCardEvent?.Invoke(this, param);
+            if (transform.localPosition.y > PLAY_CARD_POSITION_Y && hasPointerDown && hasPointerEnter)
+            {
+                CardEventArgs param = new CardEventArgs();
+                param.cardData = data;
+                playCardEvent?.Invoke(this, param);
+            }
+            else
+            {
+                //TODO reset position
+                pointerExitEvent?.Invoke(this, new CardEventArgs());
+            }
+            hasPointerDown = false;
         }
-        else
-        {
-            //TODO reset position
-            pointerExitEvent?.Invoke(this, new CardEventArgs());
-        }
-        hasPointerDown = false;
     }
 }
