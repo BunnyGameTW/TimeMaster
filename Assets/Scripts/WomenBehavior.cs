@@ -69,7 +69,7 @@ public class WomenBehavior : MonoBehaviour
         idleTimer = timer = 0.0f;
         questionCounter = 0;
         unreadCounter = 0;
-        unreadIndex = -1;
+        unreadIndex = UNREAD_INDEX;
         hasAskQuestion = false;
     }
 
@@ -111,18 +111,35 @@ public class WomenBehavior : MonoBehaviour
         showMessageEvent?.Invoke(this, new MessageEvenArgs(message));
     }
 
-    public void AddUnreadMessage(Message message)
+
+    public void AddUnreadNumber()//TODO多行訊息時看到一半離開
     {
-        if(unreadIndex != UNREAD_INDEX)//TODO show history message and unread line
+        if (unreadIndex != UNREAD_INDEX)
         {
             unreadIndex = historyMessageList.Count;
         }
         unreadCounter++;
     }
 
+    public void ResetUnreadNumber()
+    {
+        unreadCounter = 0;
+        unreadIndex = UNREAD_INDEX;
+    }
+
+    public int GetUnreadNumber()
+    {
+        return unreadCounter;
+    }
+
     public int GetScore()
     {
         return score;
+    }
+
+    public List<Message> GetHistoryMessageList()
+    {
+        return historyMessageList;
     }
 
     //event

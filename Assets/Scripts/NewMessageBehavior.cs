@@ -16,7 +16,7 @@ public class NewMessageBehavior : MonoBehaviour
 {
     public event EventHandler<NewMessageEventArgs> clickNewMessageEvent;
     public Text nameText;
-    public Text messageText;
+    public Text messageText;//TODO 超過長度
     public Image headImage;
 
     const float WAITING_TIME = 3.0f;
@@ -24,6 +24,7 @@ public class NewMessageBehavior : MonoBehaviour
     Animation ani;
     bool isDisappear;
     int womenId;
+
     // Start is called before the first frame update
     void Start()
     {

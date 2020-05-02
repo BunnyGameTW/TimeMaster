@@ -21,7 +21,7 @@ public class CardBehavior : MonoBehaviour
     Card data;
     bool hasPointerDown, hasPointerEnter;
     bool canUse;
-    Image backgroundImage;
+    Image backgroundImage ;
     Vector3 originalPosition;
 
     public event EventHandler<CardEventArgs> playCardEvent;
@@ -31,15 +31,23 @@ public class CardBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("Start card");
+       
+    }
+
+    void Init()
+    {
+        Debug.Log("Init card");
         hasPointerDown = hasPointerEnter = false;
         backgroundImage = GetComponentsInChildren<Image>()[0];
         originalPosition = transform.localPosition;
         SetCanUse(false);
     }
 
-
     public void SetCanUse(bool boolean)
     {
+        Debug.Log("SetCanUse card");
+
         canUse = boolean;
         backgroundImage.color = boolean ? Color.white : Color.gray;
     }
@@ -50,20 +58,11 @@ public class CardBehavior : MonoBehaviour
         originalPosition = transform.localPosition;
     }
 
-    void UpdateUI()
-    {
-        descriptionText.text = data.description;
-        if (data.type == CardType.Image)
-        {
-            image.sprite = Resources.Load<Sprite>(data.fileName);
-            image.gameObject.SetActive(true);
-            descriptionText.gameObject.SetActive(false);
-        }
-    }
 
     public void SetData(Card cardData)
     {
         data = cardData;
+        Init();
         UpdateUI();
     }
 
@@ -124,6 +123,17 @@ public class CardBehavior : MonoBehaviour
                 pointerExitEvent?.Invoke(this, new CardEventArgs());
             }
             hasPointerDown = false;
+        }
+    }
+
+    void UpdateUI()
+    {
+        descriptionText.text = data.description;
+        if (data.type == CardType.Image)
+        {
+            image.sprite = Resources.Load<Sprite>(data.fileName);
+            image.gameObject.SetActive(true);
+            descriptionText.gameObject.SetActive(false);
         }
     }
 }

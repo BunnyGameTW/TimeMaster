@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-public class FriendCellBehavior : MonoBehaviour
+
+public class ChatCellBehavior : MonoBehaviour
 {
-    WomenInfo data;
     public Text nameText;
-    public Text stateText;
-    public Image image;
+    public Text chatText;
+    public Image headImage;
+    public GameObject unreadObject;
+    public Text unreadNumberText;
     public event EventHandler<EventArgs> clickEvent;
 
-    bool hasDrag;
+    WomenInfo womenInfo;
+
     float height;
     Vector3 originMousePosition;
+    bool hasDrag;
 
     // Start is called before the first frame update
     void Start()
@@ -22,10 +26,9 @@ public class FriendCellBehavior : MonoBehaviour
         height = GetComponent<RectTransform>().sizeDelta.y;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))//TODO 寫個base
         {
             originMousePosition = Input.mousePosition;
         }
@@ -38,28 +41,37 @@ public class FriendCellBehavior : MonoBehaviour
                     clickEvent?.Invoke(this, EventArgs.Empty);
                 }
             }
-             hasDrag = false;
+            hasDrag = false;
         }
         else if (Input.GetMouseButton(0))
         {
-            if(Input.mousePosition != originMousePosition && !hasDrag)
+            if (Input.mousePosition != originMousePosition && !hasDrag)
             {
                 hasDrag = true;
             }
         }
     }
 
-    public void SetData(WomenInfo womenInfo)
-    {
-        data = womenInfo;
 
-        nameText.text = data.name;
-        stateText.text = data.state;
-        image.sprite = Resources.Load<Sprite>(data.fileName);
+    public void SetData(WomenInfo info)
+    {
+        womenInfo = info;
+        headImage.sprite = Resources.Load<Sprite>(info.fileName);
+        nameText.text = info.name;
     }
 
     public WomenInfo GetData()
     {
-        return data;
+        return womenInfo;
     }
+
+    //update unread number and text
+    public void UpdateUI(string text, int unreadNumber)
+    {
+        chatText.text = text;//TODO 檢查超過長度
+        unreadObject.SetActive(unreadNumber != 0);
+        unreadNumberText.text = unreadNumber.ToString();
+    }
+  
+
 }

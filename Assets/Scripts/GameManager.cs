@@ -68,12 +68,15 @@ public class GameManager : MonoBehaviour
     Dictionary<State, GameObject> navCellDictionary;
     List<GameObject> friendList;
     List<WomenBehavior> womenList;
+    List<ChatCellBehavior> chatList;
+
     void Start()
     {
         gameState = State.FRIEND;
         cardData = excelData.cardTable;
-        randomCardList = new List<Card>();
         womenIndex = NO_WOMEN_INDEX;
+        randomCardList = new List<Card>();
+        chatList = new List<ChatCellBehavior>();
 
         InitPlayerCards();
         InitScrollViewDictionary();
@@ -82,8 +85,8 @@ public class GameManager : MonoBehaviour
         InitMeInfo();
 
         InitFriendList();
-        //InitChatList();
         InitWomenList();
+
         CARD_TOTAL_WIDTH = Screen.width -
             playerCards[0].gameObject.GetComponentInChildren<RectTransform>().sizeDelta.x - CARD_PADDING * 2;
 
@@ -93,6 +96,10 @@ public class GameManager : MonoBehaviour
     //public 
     public void OnBackButtonClicked()
     {
+        foreach (Transform child in roomScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.transform)
+        {
+            Destroy(child.gameObject);
+        }
         gameState = State.CHAT;
         womenIndex = NO_WOMEN_INDEX;
         SwitchState();
@@ -158,26 +165,26 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            string[] messages = param.message.type == MessageType.WomenQuestion ?
-              GetQuestionMessageString(param.message.id) : GetResponseMessageString(param.message.id);
-            for (int i = 0; i < messages.Length; i++)
-            {
-                Debug.Log("show alert:" + women.GetData().name + "-> " + messages[i]);
-                NewMessageBehavior messageObject = Instantiate(newMessagePrefab, titleObject.transform.parent).GetComponent<NewMessageBehavior>();
-                messageObject.SetData(women.GetData(), messages[i]);
-                messageObject.clickNewMessageEvent += OnNewMessageClickEvent;
-            }
-            women.AddUnreadMessage(param.message);
+            ShowNewMessages(param.message, women);
         }
+    }
 
+    void OnChatCellClickEvent(object sender, EventArgs param)
+    {
+        ChatCellBehavior chatCell = (ChatCellBehavior)sender;
+        gameState = State.ROOM;
+        womenIndex = chatCell.GetData().id;
+        SwitchState();
     }
 
     void OnNewMessageClickEvent(object sender, NewMessageEventArgs param)
     {
+        //TODO 把同人的new message訊息都刪掉
         womenIndex = param.womenId;
         gameState = State.ROOM;
         SwitchState();
     }
+
 
     //private
     void InitWomenList()
@@ -185,7 +192,7 @@ public class GameManager : MonoBehaviour
         womenList = new List<WomenBehavior>();
         for (int i = 0; i < excelData.womenTable.Count; i++)//TODO excelData.womenTable.Count
         {
-            if (i == 0)//TODO removed
+            if (i <= 1)//TODO removed
             {
                 WomenBehavior women = Instantiate(womenPrefab).GetComponent<WomenBehavior>();
                 women.SetData(
@@ -260,19 +267,6 @@ public class GameManager : MonoBehaviour
 
     void SwitchState()
     {
-        switch (gameState)
-        {
-            case State.FRIEND:
-                break;
-            case State.CHAT:
-                break;
-            case State.ROOM:
-                UpdateScore();
-                break;
-            default:
-                break;
-        }
-
         UpdatePlayerCards();
         UpdateScrollView();
         UpdateTitle();
@@ -283,6 +277,20 @@ public class GameManager : MonoBehaviour
         cardObjectTransform.gameObject.SetActive(gameState == State.ROOM);
         selectCardTransform.gameObject.SetActive(gameState == State.ROOM);
         roomObject.SetActive(gameState == State.ROOM);
+
+        if(gameState == State.ROOM)
+        {
+            UpdateScore();
+            GetTalkWomen().ResetUnreadNumber();
+
+            //TODO show unread line
+            List<Message> list = GetTalkWomen().GetHistoryMessageList();
+            foreach (Message item in list)
+            {
+                SetCanUseCard(false);
+                ShowInRoomMessage(item.type, item.id);
+            }
+        }
     }
 
     void UpdateTitle()
@@ -484,9 +492,21 @@ public class GameManager : MonoBehaviour
         return matchData;
     }
 
+    ChatCellBehavior GetChatCell(int id)
+    {
+        foreach (ChatCellBehavior item in chatList)
+        {
+            if (item.GetData().id == id)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
     GameObject CreateFriendCell(WomenInfo data)
     {
-        Transform parent = scrollViewDictionary[State.FRIEND].GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
+        Transform parent = freindScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
         GameObject gameObject = Instantiate(friendCellPrefab, parent);
         gameObject.GetComponent<FriendCellBehavior>().SetData(data);
         gameObject.GetComponent<FriendCellBehavior>().clickEvent += OnFriendCellClickEvent;
@@ -523,9 +543,6 @@ public class GameManager : MonoBehaviour
 
     void DeleteCard(CardBehavior card)
     {
-        //card.playCardEvent -= OnPlayCardEvent;
-        //card.pointerEnterEvent -= OnCardEnterEvent;
-        //card.pointerExitEvent -= OnCardExitEvent;
         Destroy(card.gameObject);
         playerCards.Remove(card.gameObject);
     }
@@ -535,8 +552,9 @@ public class GameManager : MonoBehaviour
     {
         if (type == MessageType.Player)
         {
+            //player message
             Card card = GetCardData(id);
-            Transform parent = scrollViewDictionary[State.ROOM].GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
+            Transform parent = roomScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
             if(card.type == CardType.Text)
             {
                 GameObject gameObject = Instantiate(roomMeTextPrefab, parent);
@@ -547,6 +565,11 @@ public class GameManager : MonoBehaviour
                 GameObject gameObject = Instantiate(roomMeImagePrefab, parent);
                 gameObject.GetComponentsInChildren<Image>()[1].sprite = Resources.Load<Sprite>(card.fileName);
             }
+
+
+            string text = card.type == CardType.Text ? card.description : "傳送了圖片";//TODO
+            UpdateChatList(GetTalkWomen(), text, true);
+
             StartCoroutine(AutoScroll());
         }
         else
@@ -556,7 +579,9 @@ public class GameManager : MonoBehaviour
             for (int i = 0; i < messages.Length; i++)
             {
                 AddWomenMessage(messages[i]);
-                if(i == messages.Length - 1 && type == MessageType.WomenQuestion)
+                UpdateChatList(GetTalkWomen(), messages[i], true);
+
+                if (i == messages.Length - 1 && type == MessageType.WomenQuestion)
                 {
                     SetCanUseCard(true);
                 }
@@ -564,9 +589,45 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void ShowNewMessages(Message message, WomenBehavior women)
+    {
+        string[] messages = message.type == MessageType.WomenQuestion ?
+             GetQuestionMessageString(message.id) : GetResponseMessageString(message.id);
+        for (int i = 0; i < messages.Length; i++)
+        {
+            Debug.Log("show alert:" + women.GetData().name + "-> " + messages[i]);
+
+            NewMessageBehavior messageObject = Instantiate(newMessagePrefab, titleObject.transform.parent).GetComponent<NewMessageBehavior>();
+            messageObject.SetData(women.GetData(), messages[i]);
+            messageObject.clickNewMessageEvent += OnNewMessageClickEvent;
+
+            women.AddUnreadNumber();
+            UpdateChatList(women, messages[i], false);
+
+        }
+    }
+
+    void UpdateChatList(WomenBehavior women, string text, bool isTalkWomen)
+    {
+        //update chat cell
+        ChatCellBehavior chatCell = GetChatCell(women.GetData().id);
+        if (chatCell == null)
+        {
+            Transform parent = chatScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
+            chatCell = Instantiate(chatCellPrefab, parent).GetComponent<ChatCellBehavior>();
+            chatCell.SetData(women.GetData());
+            chatCell.clickEvent += OnChatCellClickEvent;
+            chatList.Add(chatCell);
+        }
+        chatCell.UpdateUI(text, isTalkWomen ? 0 : women.GetUnreadNumber());
+
+        //reorder list
+        chatCell.gameObject.transform.SetAsFirstSibling();
+    }
+
     void AddWomenMessage(string text)
     {
-        Transform parent = scrollViewDictionary[State.ROOM].GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
+        Transform parent = roomScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
         GameObject gameObject = Instantiate(roomGirlPrefab, parent);
         gameObject.GetComponentInChildren<Text>().text = text;
         gameObject.GetComponentsInChildren<Image>()[1].sprite = Resources.Load<Sprite>(GetTalkWomen().GetData().fileName);
@@ -575,17 +636,16 @@ public class GameManager : MonoBehaviour
  
     IEnumerator AutoScroll()
     {
-        RectTransform parent = scrollViewDictionary[State.ROOM].GetComponentInChildren<ContentSizeFitter>().gameObject.GetComponent<RectTransform>();
+        RectTransform parent = roomScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.GetComponent<RectTransform>();
         LayoutRebuilder.ForceRebuildLayoutImmediate(parent);
         yield return new WaitForEndOfFrame();
         yield return new WaitForEndOfFrame();
-        scrollViewDictionary[State.ROOM].GetComponentInChildren<ScrollRect>().verticalNormalizedPosition = 0;
+        roomScrollViewObject.GetComponentInChildren<ScrollRect>().verticalNormalizedPosition = 0;
     }
 
    
     void SetCanUseCard(bool boolean)
     {
-        Debug.Log("playerCards.Count" + playerCards.Count);
         for (int i = 0; i < playerCards.Count; i++)
         {
             playerCards[i].GetComponent<CardBehavior>().SetCanUse(boolean);
