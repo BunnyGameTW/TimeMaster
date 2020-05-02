@@ -1092,7 +1092,7 @@ MonoBehaviour:
     hasMuitipleLine: 0
   - id: 5
     type: 1
-    description: "\u6211\u807D\u5230{0}\u8AAA\u805A\u6703\u770B\u5230\u4F60\u8DDF{0}\u5728\u4E00\u8D77\u7684\u756B\u9762\n\u662F\u771F\u7684\u55CE"
+    description: "\u6211\u807D\u5230{0}\u8AAA\u805A\u6703\u770B\u5230\u4F60\u8DDF{1}\u5728\u4E00\u8D77\u7684\u756B\u9762\n\u662F\u771F\u7684\u55CE"
     formatNumber: 2
     hasMuitipleLine: 1
   - id: 6

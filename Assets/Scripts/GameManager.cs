@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
     public GameObject meObject, roomObject;
     public GameObject womenPrefab;
     public GameObject newMessagePrefab;
+    public AudioClip wrong, correct, click;
 
     const int WOMEN_NUMBER = 2;
     const int NO_WOMEN_INDEX = -1;
@@ -69,6 +70,7 @@ public class GameManager : MonoBehaviour
     List<GameObject> friendList;
     List<WomenBehavior> womenList;
     List<ChatCellBehavior> chatList;
+    AudioSource audioSource;
 
     void Start()
     {
@@ -77,7 +79,7 @@ public class GameManager : MonoBehaviour
         womenIndex = NO_WOMEN_INDEX;
         randomCardList = new List<Card>();
         chatList = new List<ChatCellBehavior>();
-
+        audioSource = GetComponent<AudioSource>();
         InitPlayerCards();
         InitScrollViewDictionary();
         InitTitleDictionary();
@@ -96,10 +98,7 @@ public class GameManager : MonoBehaviour
     //public 
     public void OnBackButtonClicked()
     {
-        foreach (Transform child in roomScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.transform)
-        {
-            Destroy(child.gameObject);
-        }
+       
         gameState = State.CHAT;
         womenIndex = NO_WOMEN_INDEX;
         SwitchState();
@@ -135,6 +134,7 @@ public class GameManager : MonoBehaviour
 
     void OnNavCellClickEvent(object sender, EventArgs param)
     {
+        audioSource.PlayOneShot(click);
         NavCellBehavior navCell = (NavCellBehavior)sender;
         foreach (KeyValuePair<State, GameObject> pair in navCellDictionary)
         {
@@ -149,6 +149,7 @@ public class GameManager : MonoBehaviour
 
     void OnFriendCellClickEvent(object sender, EventArgs param)
     {
+        audioSource.PlayOneShot(click);
         FriendCellBehavior friendCell = (FriendCellBehavior)sender;
         gameState = State.ROOM;
         womenIndex = friendCell.GetData().id;
@@ -161,7 +162,7 @@ public class GameManager : MonoBehaviour
         if (women.GetData().id == womenIndex)
         {
             UpdateScore();
-            ShowInRoomMessage(param.message.type, param.message.id);
+            ShowInRoomMessage(param.message.type, param.message.id, false);
         }
         else
         {
@@ -171,6 +172,7 @@ public class GameManager : MonoBehaviour
 
     void OnChatCellClickEvent(object sender, EventArgs param)
     {
+        audioSource.PlayOneShot(click);
         ChatCellBehavior chatCell = (ChatCellBehavior)sender;
         gameState = State.ROOM;
         womenIndex = chatCell.GetData().id;
@@ -180,17 +182,22 @@ public class GameManager : MonoBehaviour
     void OnNewMessageClickEvent(object sender, NewMessageEventArgs param)
     {
         //TODO 把同人的new message訊息都刪掉
+        audioSource.PlayOneShot(click);
         womenIndex = param.womenId;
         gameState = State.ROOM;
         SwitchState();
     }
 
+    void OnAudioEvent(object sender, AudioEventArgs param)
+    {
+        audioSource.PlayOneShot(param.responseType == WomenResponseType.Wrong ? wrong: correct);
+    }
 
     //private
     void InitWomenList()
     {
         womenList = new List<WomenBehavior>();
-        for (int i = 0; i < excelData.womenTable.Count; i++)//TODO excelData.womenTable.Count
+        for (int i = 0; i < excelData.womenTable.Count; i++)
         {
             if (i <= 1)//TODO removed
             {
@@ -201,6 +208,7 @@ public class GameManager : MonoBehaviour
                     excelData.responseTable,
                     GetWomenMatchData(excelData.womenTable[i].id));
                 women.showMessageEvent += OnShowMessageEvent;
+                women.audioEvent += OnAudioEvent;
                 womenList.Add(women);
             }
         }
@@ -280,15 +288,21 @@ public class GameManager : MonoBehaviour
 
         if(gameState == State.ROOM)
         {
+            foreach (Transform child in roomScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
             UpdateScore();
             GetTalkWomen().ResetUnreadNumber();
 
             //TODO show unread line
+            GetTalkWomen().SetFormatNameIndex(0);
             List<Message> list = GetTalkWomen().GetHistoryMessageList();
             foreach (Message item in list)
             {
                 SetCanUseCard(false);
-                ShowInRoomMessage(item.type, item.id);
+                ShowInRoomMessage(item.type, item.id, true);
             }
         }
     }
@@ -386,21 +400,37 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    string[] GetQuestionMessageString(int id)
+    string[] GetQuestionMessageString(int id, WomenBehavior women, bool isHistory)
     {
         WomenQuestion q = GetQuestionData(id);
         string str = q.description;
+        
+        //format name
+        if (!isHistory)
+        {
+            List<WomenInfo> list = GetNotIncludedWomenInfo(women.GetData().id);
+            for (int i = 0; i < q.formatNumber; i++)
+            {
+                int index = UnityEngine.Random.Range(0, list.Count);
+                Debug.Log(list[index].name);
+                women.AddFormatName(list[index].name);
+                list.RemoveAt(index);
+            }
+        }
 
-        //List<WomenInfo> list = GetNotIncludedWomenInfo(GetTalkWomen().GetData().id);
-        //for (int i = 0; i < q.formatNumber; i++)
-        //{
-        //    int index = UnityEngine.Random.Range(0, list.Count);
-        //    str = string.Format(str, list[index].name);
-        //    //TODO 格式化人名要記下來
-
-        //    list.RemoveAt(index);
-        //Debug.Log("after format->" + str);
-        //}
+        if(q.formatNumber == 1)
+        {
+            str = string.Format(str, women.GetFormatName());
+            women.SetFormatNameIndex(women.GetFormatNameIndex() + 1);
+        }
+        else if(q.formatNumber == 2)
+        {
+            string name1 = women.GetFormatName();
+            women.SetFormatNameIndex(women.GetFormatNameIndex() + 1);
+            string name2 = women.GetFormatName();
+            women.SetFormatNameIndex(women.GetFormatNameIndex() + 1);
+            str = string.Format(str, name1, name2);
+        }
 
         if (q.hasMuitipleLine)
         {
@@ -548,7 +578,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void ShowInRoomMessage(MessageType type, int id)
+    void ShowInRoomMessage(MessageType type, int id, bool isHistory)
     {
         if (type == MessageType.Player)
         {
@@ -575,7 +605,7 @@ public class GameManager : MonoBehaviour
         else
         {
             string[] messages = type == MessageType.WomenQuestion ? 
-                GetQuestionMessageString(id) : GetResponseMessageString(id);
+                GetQuestionMessageString(id, GetTalkWomen(), isHistory) : GetResponseMessageString(id);
             for (int i = 0; i < messages.Length; i++)
             {
                 AddWomenMessage(messages[i]);
@@ -592,7 +622,7 @@ public class GameManager : MonoBehaviour
     void ShowNewMessages(Message message, WomenBehavior women)
     {
         string[] messages = message.type == MessageType.WomenQuestion ?
-             GetQuestionMessageString(message.id) : GetResponseMessageString(message.id);
+             GetQuestionMessageString(message.id, women, false) : GetResponseMessageString(message.id);
         for (int i = 0; i < messages.Length; i++)
         {
             Debug.Log("show alert:" + women.GetData().name + "-> " + messages[i]);

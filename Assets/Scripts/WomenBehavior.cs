@@ -29,6 +29,14 @@ public class MessageEvenArgs : EventArgs
     }
 }
 
+public class AudioEventArgs : EventArgs
+{
+    public WomenResponseType responseType;
+    public AudioEventArgs(WomenResponseType type)
+    {
+        responseType = type;
+    }
+}
 public class WomenBehavior : MonoBehaviour
 {
     const float ASK_QUESTION_TIME = 10.0f;
@@ -54,15 +62,18 @@ public class WomenBehavior : MonoBehaviour
     int unreadCounter;
     int questionId;
     int unreadIndex;
+    int formatNameIndex;
     List<Message> historyMessageList = new List<Message>();
     List<int> randomQuestionList = new List<int>();
     List<int> startQuestionIdList = new List<int>();
     List<int> wrongResponseIdList = new List<int>();
     List<int> idleResponseIdList = new List<int>();
-
+    List<string> formatNameList = new List<string>();
 
     public event EventHandler<MessageEvenArgs> showMessageEvent;
+    public event EventHandler<AudioEventArgs> audioEvent;
 
+    
     void Start()
     {
         RANDOM_START_TIME = UnityEngine.Random.Range(MIN_START_TIME, MAX_START_TIME);
@@ -71,6 +82,7 @@ public class WomenBehavior : MonoBehaviour
         unreadCounter = 0;
         unreadIndex = UNREAD_INDEX;
         hasAskQuestion = false;
+        formatNameIndex = 0;
     }
 
     // Update is called once per frame
@@ -142,6 +154,27 @@ public class WomenBehavior : MonoBehaviour
         return historyMessageList;
     }
 
+    public void AddFormatName(string name)
+    {
+        formatNameList.Add(name);
+    }
+
+    public string GetFormatName()
+    {
+    
+        return formatNameList[formatNameIndex];
+    }
+
+    public void SetFormatNameIndex(int i)
+    {
+        formatNameIndex = i;
+    }
+
+    public int GetFormatNameIndex()
+    {
+        return formatNameIndex;
+    }
+
     //event
     public void OnPlayCardEvent(Card card)
     {
@@ -159,10 +192,12 @@ public class WomenBehavior : MonoBehaviour
             {
                 AskQuestion(info.nextQuestionId);
             }
+            audioEvent?.Invoke(this, new AudioEventArgs(WomenResponseType.Normal));
         }
         else
         {
             int responseId = wrongResponseIdList[UnityEngine.Random.Range(0, wrongResponseIdList.Count)];
+            audioEvent?.Invoke(this, new AudioEventArgs(WomenResponseType.Wrong));
             AddScore(WRONG_ANSWER_SCORE);
             AddMessage(responseId, MessageType.WomenResponse);
         }
