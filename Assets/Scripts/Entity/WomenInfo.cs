@@ -9,5 +9,6 @@ public class WomenInfo
     public string job;
     public string state;
     public string fileName;
+    public string end;
 }
 

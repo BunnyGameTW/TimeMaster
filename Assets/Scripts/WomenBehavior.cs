@@ -41,12 +41,13 @@ public class WomenBehavior : MonoBehaviour
 {
     const float ASK_QUESTION_TIME = 10.0f;
     const float IDLE_TIME = 10.0f;
-    const int IDLE_SCORE = 10;
+    const int IDLE_SCORE = 100;
     const int WRONG_ANSWER_SCORE = 10;
     const float MIN_START_TIME = 0.0f;
     const float MAX_START_TIME = 5.0f;
     const int UNREAD_INDEX = -1;
-
+    const int MIN_SCORE = 0;
+    const int MAX_SCORE = 100;
 
 
     WomenInfo data;
@@ -63,6 +64,7 @@ public class WomenBehavior : MonoBehaviour
     int questionId;
     int unreadIndex;
     int formatNameIndex;
+    bool isGameOver;
     List<Message> historyMessageList = new List<Message>();
     List<int> randomQuestionList = new List<int>();
     List<int> startQuestionIdList = new List<int>();
@@ -72,8 +74,10 @@ public class WomenBehavior : MonoBehaviour
 
     public event EventHandler<MessageEvenArgs> showMessageEvent;
     public event EventHandler<AudioEventArgs> audioEvent;
+    public event EventHandler<EventArgs> gameOverEvent;
 
     
+
     void Start()
     {
         RANDOM_START_TIME = UnityEngine.Random.Range(MIN_START_TIME, MAX_START_TIME);
@@ -83,20 +87,25 @@ public class WomenBehavior : MonoBehaviour
         unreadIndex = UNREAD_INDEX;
         hasAskQuestion = false;
         formatNameIndex = 0;
+        score = 0;
+        isGameOver = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (hasAskQuestion)
+        if (!isGameOver)
         {
-            idleTimer += Time.deltaTime;
-            CheckIdle();
-        }
-        else
-        {
-            timer += Time.deltaTime;
-            CheckAskQuestion();
+            if (hasAskQuestion)
+            {
+                idleTimer += Time.deltaTime;
+                CheckIdle();
+            }
+            else
+            {
+                timer += Time.deltaTime;
+                CheckAskQuestion();
+            }
         }
     }
 
@@ -175,6 +184,10 @@ public class WomenBehavior : MonoBehaviour
         return formatNameIndex;
     }
 
+    public void SetGameOver()
+    {
+        isGameOver = true;
+    }
     //event
     public void OnPlayCardEvent(Card card)
     {
@@ -239,7 +252,14 @@ public class WomenBehavior : MonoBehaviour
     void AddScore(int number)
     {
         score += number;
-        score = score < 0 ? 0 : score;
+        if(score >= MAX_SCORE)
+        {
+            gameOverEvent?.Invoke(this, EventArgs.Empty);
+        }
+        else if(score < 0)
+        {
+            score = 0;
+        }
     }
 
     void AddCoolDownTime(float time)

@@ -23,13 +23,17 @@ public class GameManager : MonoBehaviour
     public GameObject cardPrefab, friendCellPrefab, chatCellPrefab, roomGirlPrefab, roomMeTextPrefab, roomMeImagePrefab;
     public GameObject navCellPrefab;
     public Transform cardObjectTransform;
-    public Transform selectCardTransform;
+    public Transform selectCardTransform, newMessageTransform;
     public GameObject titleObject, navBarObject;
     public GameObject freindScrollViewObject, chatScrollViewObject, roomScrollViewObject;
     public GameObject meObject, roomObject;
     public GameObject womenPrefab;
     public GameObject newMessagePrefab;
     public AudioClip wrong, correct, click;
+    public GameObject endObject;
+    public Text endText, scoreText;
+    public Image endImage;
+    public Text timeText;
 
     const int WOMEN_NUMBER = 2;
     const int NO_WOMEN_INDEX = -1;
@@ -49,6 +53,8 @@ public class GameManager : MonoBehaviour
     const string PLAYER_NAME = "小豬";
     const string PLAYER_STATE = "I wonna know, 你行不行";
     const string PLAYER_PHOTO_FILE_NAME = "player_photo";
+    const float GAME_TIME = 60.0f;
+    const string HAPPY_END_STRING = "你精通了時間管理術\n持續徜徉於多人聊天運動的快樂中";
 
     float CARD_TOTAL_WIDTH;
 
@@ -59,8 +65,10 @@ public class GameManager : MonoBehaviour
         FRIEND, CHAT, ROOM, SETTING
     }
     State gameState;
-
+    float timer;
     int womenIndex;
+    bool isGameOver;
+    float secondTime;
     List<Card> randomCardList;
     List<GameObject> playerCards;
     Dictionary<State, GameObject> scrollViewDictionary;
@@ -72,9 +80,13 @@ public class GameManager : MonoBehaviour
     List<ChatCellBehavior> chatList;
     AudioSource audioSource;
 
+
     void Start()
     {
         gameState = State.FRIEND;
+        timer = 0.0f;
+        secondTime = Mathf.Infinity;
+        isGameOver = false;
         cardData = excelData.cardTable;
         womenIndex = NO_WOMEN_INDEX;
         randomCardList = new List<Card>();
@@ -85,7 +97,6 @@ public class GameManager : MonoBehaviour
         InitTitleDictionary();
         InitNavBar();
         InitMeInfo();
-
         InitFriendList();
         InitWomenList();
 
@@ -95,10 +106,38 @@ public class GameManager : MonoBehaviour
         SwitchState();
     }
 
+    void Update()
+    {
+        if (!isGameOver)
+        {
+            timer += Time.deltaTime;
+            if(Mathf.FloorToInt(timer) != secondTime)
+            {
+                secondTime = Mathf.FloorToInt(timer);
+                timeText.text = (GAME_TIME - Mathf.FloorToInt(timer)).ToString();
+            }
+            if (timer >= GAME_TIME)
+            {
+                isGameOver = true;
+                GameOver(NO_WOMEN_INDEX, GetScore());
+            }
+        }
+    }
+
+    int GetScore()
+    {
+        int score = 0;
+        foreach (WomenBehavior item in womenList)
+        {
+            score += item.GetScore();
+        }
+        return score;
+    }
+
     //public 
     public void OnBackButtonClicked()
     {
-       
+        audioSource.PlayOneShot(click);
         gameState = State.CHAT;
         womenIndex = NO_WOMEN_INDEX;
         SwitchState();
@@ -181,11 +220,22 @@ public class GameManager : MonoBehaviour
 
     void OnNewMessageClickEvent(object sender, NewMessageEventArgs param)
     {
-        //TODO 把同人的new message訊息都刪掉
+        CheckNewMessageObject(param.womenId);
         audioSource.PlayOneShot(click);
         womenIndex = param.womenId;
         gameState = State.ROOM;
         SwitchState();
+    }
+
+    void CheckNewMessageObject(int id)
+    {
+        foreach (Transform item in newMessageTransform)
+        {
+            if(item.GetComponent<NewMessageBehavior>().GetWomenId() == id)
+            {
+                Destroy(item.gameObject);
+            }
+        }
     }
 
     void OnAudioEvent(object sender, AudioEventArgs param)
@@ -193,6 +243,26 @@ public class GameManager : MonoBehaviour
         audioSource.PlayOneShot(param.responseType == WomenResponseType.Wrong ? wrong: correct);
     }
 
+    void OnGameOverEvent(object sender, EventArgs param)
+    {
+        isGameOver = true;
+        WomenBehavior women = (WomenBehavior)sender;
+        GameOver(women.GetData().id, women.GetScore());
+    }
+
+    void GameOver(int id, int score)
+    {
+        foreach (WomenBehavior item in womenList)
+        {
+            item.SetGameOver();
+        }
+        Destroy(newMessageTransform.gameObject);
+
+        endImage.sprite = Resources.Load <Sprite>(string.Format("end_{0}", id));
+        endText.text = id == NO_WOMEN_INDEX ? HAPPY_END_STRING : excelData.womenTable[id - 1].end;
+        scoreText.text = string.Format(scoreText.text, score);
+        endObject.SetActive(true);
+    }
     //private
     void InitWomenList()
     {
@@ -209,6 +279,7 @@ public class GameManager : MonoBehaviour
                     GetWomenMatchData(excelData.womenTable[i].id));
                 women.showMessageEvent += OnShowMessageEvent;
                 women.audioEvent += OnAudioEvent;
+                women.gameOverEvent += OnGameOverEvent;
                 womenList.Add(women);
             }
         }
@@ -627,7 +698,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("show alert:" + women.GetData().name + "-> " + messages[i]);
 
-            NewMessageBehavior messageObject = Instantiate(newMessagePrefab, titleObject.transform.parent).GetComponent<NewMessageBehavior>();
+            NewMessageBehavior messageObject = Instantiate(newMessagePrefab, newMessageTransform).GetComponent<NewMessageBehavior>();
             messageObject.SetData(women.GetData(), messages[i]);
             messageObject.clickNewMessageEvent += OnNewMessageClickEvent;
 

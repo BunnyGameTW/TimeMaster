@@ -56,11 +56,15 @@ public class NewMessageBehavior : MonoBehaviour
     public void OnButtonClicked()
     {
         clickNewMessageEvent?.Invoke(this, new NewMessageEventArgs(womenId));
-        Destroy(gameObject);
     }
 
     public void OnAnimationEnd()
     {
         Destroy(gameObject);
+    }
+ 
+    public int GetWomenId()
+    {
+        return womenId;
     }
 }
