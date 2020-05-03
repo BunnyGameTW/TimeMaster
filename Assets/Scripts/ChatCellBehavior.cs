@@ -34,7 +34,7 @@ public class ChatCellBehavior : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            if (Input.mousePosition.y < transform.position.y + height / 2 && Input.mousePosition.y > transform.position.y - height / 2)
+            if (Input.mousePosition.y < (transform.position.y + height / 2) && Input.mousePosition.y > (transform.position.y - height / 2))
             {
                 if (!hasDrag)
                 {

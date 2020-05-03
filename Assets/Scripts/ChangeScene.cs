@@ -16,7 +16,6 @@ public class ChangeScene : MonoBehaviour
         
     }
 
-    //TODO 換圖片大屌 按鈕消失 轉場
     public void LoadScene(string name)
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene(name);

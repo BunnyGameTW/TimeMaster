@@ -39,9 +39,9 @@ public class AudioEventArgs : EventArgs
 }
 public class WomenBehavior : MonoBehaviour
 {
-    const float ASK_QUESTION_TIME = 10.0f;
-    const float IDLE_TIME = 10.0f;
-    const int IDLE_SCORE = 100;
+    const float ASK_QUESTION_TIME = 6.0f;
+    const float IDLE_TIME = 6.0f;
+    const int IDLE_SCORE = 15;
     const int WRONG_ANSWER_SCORE = 10;
     const float MIN_START_TIME = 0.0f;
     const float MAX_START_TIME = 5.0f;
@@ -262,7 +262,7 @@ public class WomenBehavior : MonoBehaviour
         }
     }
 
-    void AddCoolDownTime(float time)
+    void AddCoolDownTime(float time)//TODO?
     {
         timer -= time;
     }

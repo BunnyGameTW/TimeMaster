@@ -34,6 +34,10 @@ public class GameManager : MonoBehaviour
     public Text endText, scoreText;
     public Image endImage;
     public Text timeText;
+    public Slider changeBackgroundSlider;
+    public Sprite normalBackground, nakedBackground;
+    public Image backgroundImage;
+    public GameObject settingObject;
 
     const int WOMEN_NUMBER = 2;
     const int NO_WOMEN_INDEX = -1;
@@ -47,9 +51,9 @@ public class GameManager : MonoBehaviour
     const string ROOM_TITLE = "名字";
     const string SETTING_TITLE = "設定";
     const float NAV_ICON_SCALE_RATIO = 1.2f;
-    const string NAV_FRIEND_ICON_FILE_NAME = "bunny";
-    const string NAV_CHAT_ICON_FILE_NAME = "bunny";
-    const string NAV_SETTING_ICON_FILE_NAME = "bunny";
+    const string NAV_FRIEND_ICON_FILE_NAME = "icon_friend";
+    const string NAV_CHAT_ICON_FILE_NAME = "icon_chat";
+    const string NAV_SETTING_ICON_FILE_NAME = "icon_setting";
     const string PLAYER_NAME = "小豬";
     const string PLAYER_STATE = "I wonna know, 你行不行";
     const string PLAYER_PHOTO_FILE_NAME = "player_photo";
@@ -92,6 +96,7 @@ public class GameManager : MonoBehaviour
         randomCardList = new List<Card>();
         chatList = new List<ChatCellBehavior>();
         audioSource = GetComponent<AudioSource>();
+        changeBackgroundSlider.onValueChanged.AddListener(delegate { OnSliderValueChanged(); });
         InitPlayerCards();
         InitScrollViewDictionary();
         InitTitleDictionary();
@@ -100,8 +105,7 @@ public class GameManager : MonoBehaviour
         InitFriendList();
         InitWomenList();
 
-        CARD_TOTAL_WIDTH = Screen.width -
-            playerCards[0].gameObject.GetComponentInChildren<RectTransform>().sizeDelta.x - CARD_PADDING * 2;
+        CARD_TOTAL_WIDTH = playerCards[0].gameObject.GetComponentInChildren<RectTransform>().sizeDelta.x;
 
         SwitchState();
     }
@@ -143,6 +147,21 @@ public class GameManager : MonoBehaviour
         SwitchState();
     }
 
+    //TODO
+    void OnSliderValueChanged()
+    {
+        if(changeBackgroundSlider.value == 0.0f)
+        {
+            backgroundImage.sprite = normalBackground;
+            changeBackgroundSlider.GetComponentsInChildren<Image>()[0].color = Color.gray;
+        }
+        else
+        {
+            backgroundImage.sprite = nakedBackground;
+            changeBackgroundSlider.GetComponentsInChildren<Image>()[0].color = new Color(0.65f, 1.0f, 0.7f);
+        }
+    }
+
     //event
     void OnPlayCardEvent(object sender, CardEventArgs param)
     {
@@ -160,9 +179,11 @@ public class GameManager : MonoBehaviour
         UpdatePlayerCards();
     }
 
+    //TODO
     void OnCardEnterEvent(object sender, CardEventArgs param)
     {
         CardBehavior cardModel = (CardBehavior)sender;
+        //cardModel.transform.SetAsFirstSibling();
         cardModel.transform.SetParent(selectCardTransform);
     }
 
@@ -247,7 +268,7 @@ public class GameManager : MonoBehaviour
     {
         isGameOver = true;
         WomenBehavior women = (WomenBehavior)sender;
-        GameOver(women.GetData().id, women.GetScore());
+        GameOver(women.GetData().id, GetScore());
     }
 
     void GameOver(int id, int score)
@@ -257,20 +278,33 @@ public class GameManager : MonoBehaviour
             item.SetGameOver();
         }
         Destroy(newMessageTransform.gameObject);
+        //TODO 有圖時要換
+        string fileName;
+        if (id == NO_WOMEN_INDEX)
+        {
+            fileName = "end_0";
+        }
+        else
+        {
+            fileName = id > 2 ? "to_be_continue" : string.Format("end_{0}", id);
+        }
+        
+        string charName = id == NO_WOMEN_INDEX ? "大師": womenList[id - 1].GetData().name;
 
-        endImage.sprite = Resources.Load <Sprite>(string.Format("end_{0}", id));
+        endImage.sprite = Resources.Load <Sprite>(fileName);
         endText.text = id == NO_WOMEN_INDEX ? HAPPY_END_STRING : excelData.womenTable[id - 1].end;
-        scoreText.text = string.Format(scoreText.text, score);
+        scoreText.text = charName + "結局：\n" + string.Format(scoreText.text, score);
         endObject.SetActive(true);
     }
+
     //private
     void InitWomenList()
     {
         womenList = new List<WomenBehavior>();
         for (int i = 0; i < excelData.womenTable.Count; i++)
         {
-            if (i <= 1)//TODO removed
-            {
+            //if (i <= 1)//TODO removed
+            //{
                 WomenBehavior women = Instantiate(womenPrefab).GetComponent<WomenBehavior>();
                 women.SetData(
                     excelData.womenTable[i],
@@ -281,7 +315,7 @@ public class GameManager : MonoBehaviour
                 women.audioEvent += OnAudioEvent;
                 women.gameOverEvent += OnGameOverEvent;
                 womenList.Add(women);
-            }
+            //}
         }
     }
 
@@ -356,6 +390,7 @@ public class GameManager : MonoBehaviour
         cardObjectTransform.gameObject.SetActive(gameState == State.ROOM);
         selectCardTransform.gameObject.SetActive(gameState == State.ROOM);
         roomObject.SetActive(gameState == State.ROOM);
+        settingObject.SetActive(gameState == State.SETTING);
 
         if(gameState == State.ROOM)
         {
@@ -427,8 +462,7 @@ public class GameManager : MonoBehaviour
         float mid = (playerCards.Count - 1) / 2;
         for (int i = 0; i < playerCards.Count; i++)
         {
-            float offset = CARD_TOTAL_WIDTH / playerCards.Count;
-            playerCards[i].GetComponent<CardBehavior>().UpdatePosition(new Vector3((i - mid) * offset, CARD_START_POSITION_Y, 0));
+            playerCards[i].GetComponent<CardBehavior>().UpdatePosition(new Vector3((i - mid) * CARD_TOTAL_WIDTH, CARD_START_POSITION_Y, 0));
         }
 
         //z order
@@ -483,7 +517,6 @@ public class GameManager : MonoBehaviour
             for (int i = 0; i < q.formatNumber; i++)
             {
                 int index = UnityEngine.Random.Range(0, list.Count);
-                Debug.Log(list[index].name);
                 women.AddFormatName(list[index].name);
                 list.RemoveAt(index);
             }
