@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-
+using TMPro;
 public class CardEventArgs : EventArgs
 {
     public Card cardData;
@@ -11,7 +11,7 @@ public class CardEventArgs : EventArgs
 
 public class CardBehavior : MonoBehaviour
 {
-    public Text descriptionText;
+    public TextMeshProUGUI descriptionText;
     public Image image;
 
     const float MOVE_OFFSET_Y = 100.0f;

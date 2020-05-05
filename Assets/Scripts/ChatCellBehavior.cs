@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-
+using TMPro;
 public class ChatCellBehavior : MonoBehaviour
 {
-    public Text nameText;
-    public Text chatText;
+    public TextMeshProUGUI nameText;
+    public TextMeshProUGUI chatText;
     public Image headImage;
     public GameObject unreadObject;
-    public Text unreadNumberText;
+    public TextMeshProUGUI unreadNumberText;
     public event EventHandler<EventArgs> clickEvent;
 
     WomenInfo womenInfo;

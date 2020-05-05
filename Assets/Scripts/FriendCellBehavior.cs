@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using TMPro;
 public class FriendCellBehavior : MonoBehaviour
 {
     WomenInfo data;
-    public Text nameText;
-    public Text stateText;
+    public TextMeshProUGUI nameText;
+    public TextMeshProUGUI stateText;
     public Image image;
     public event EventHandler<EventArgs> clickEvent;
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using System;
+using TMPro;
 
 public struct NavData
 {
@@ -31,9 +32,9 @@ public class GameManager : MonoBehaviour
     public GameObject newMessagePrefab;
     public AudioClip wrong, correct, click;
     public GameObject endObject;
-    public Text endText, scoreText;
+    public TextMeshProUGUI endText, scoreText;
     public Image endImage;
-    public Text timeText;
+    public TextMeshProUGUI timeText;
     public Slider changeBackgroundSlider;
     public Sprite normalBackground, nakedBackground;
     public Image backgroundImage;
@@ -323,8 +324,8 @@ public class GameManager : MonoBehaviour
 
     void InitMeInfo()
     {
-        meObject.GetComponentsInChildren<Text>()[0].text = PLAYER_NAME;
-        meObject.GetComponentsInChildren<Text>()[1].text = PLAYER_STATE;
+        meObject.GetComponentsInChildren<TextMeshProUGUI>()[0].text = PLAYER_NAME;
+        meObject.GetComponentsInChildren<TextMeshProUGUI>()[1].text = PLAYER_STATE;
         meObject.GetComponentsInChildren<Image>()[1].sprite = Resources.Load<Sprite>(PLAYER_PHOTO_FILE_NAME);
     }
 
@@ -420,7 +421,7 @@ public class GameManager : MonoBehaviour
         {
             title = GetTalkWomen().GetData().name;
         }
-        titleObject.GetComponentInChildren<Text>().text = title;
+        titleObject.GetComponentInChildren<TextMeshProUGUI>().text = title;
     }
 
     void UpdateScrollView()
@@ -447,13 +448,13 @@ public class GameManager : MonoBehaviour
         {
             pair.Value.transform.localScale = new Vector3(1, 1, 1);
             pair.Value.GetComponentInChildren<Image>().color = Color.gray;
-            pair.Value.GetComponentInChildren<Text>().color = Color.gray;
+            pair.Value.GetComponentInChildren<TextMeshProUGUI>().color = Color.gray;
         }
 
         GameObject gameObject = navCellDictionary[gameState];
         gameObject.transform.localScale = new Vector3(NAV_ICON_SCALE_RATIO, NAV_ICON_SCALE_RATIO, 1);
         gameObject.GetComponentInChildren<Image>().color = Color.white;
-        gameObject.GetComponentInChildren<Text>().color = Color.white;
+        gameObject.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
     }
 
     void UpdatePlayerCards()
@@ -476,7 +477,7 @@ public class GameManager : MonoBehaviour
     void UpdateScore()
     {
         float score = GetTalkWomen().GetScore();
-        roomObject.GetComponentInChildren<Text>().text = score.ToString();
+        roomObject.GetComponentInChildren<TextMeshProUGUI>().text = score.ToString();
         roomObject.GetComponentsInChildren<Image>()[1].fillAmount = score / MAX_SCORE;
     }
 
@@ -692,7 +693,7 @@ public class GameManager : MonoBehaviour
             if(card.type == CardType.Text)
             {
                 GameObject gameObject = Instantiate(roomMeTextPrefab, parent);
-                gameObject.GetComponentInChildren<Text>().text = card.description;
+                gameObject.GetComponentInChildren<TextMeshProUGUI>().text = card.description;
             }
             else
             {
@@ -763,7 +764,7 @@ public class GameManager : MonoBehaviour
     {
         Transform parent = roomScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
         GameObject gameObject = Instantiate(roomGirlPrefab, parent);
-        gameObject.GetComponentInChildren<Text>().text = text;
+        gameObject.GetComponentInChildren<TextMeshProUGUI>().text = text;
         gameObject.GetComponentsInChildren<Image>()[1].sprite = Resources.Load<Sprite>(GetTalkWomen().GetData().fileName);
         StartCoroutine(AutoScroll());
     }

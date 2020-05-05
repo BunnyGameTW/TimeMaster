@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using TMPro;
 public class NavCellBehavior : MonoBehaviour
 {
     NavData data;
-    public Text text;
+    public TextMeshProUGUI text;
     public Image image;
     public event EventHandler<EventArgs> clickEvent;
 

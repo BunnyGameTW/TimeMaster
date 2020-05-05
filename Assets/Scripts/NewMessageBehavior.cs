@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.UI;
-
+using TMPro;
 public class NewMessageEventArgs : EventArgs
 {
     public int womenId;
@@ -15,8 +15,8 @@ public class NewMessageEventArgs : EventArgs
 public class NewMessageBehavior : MonoBehaviour
 {
     public event EventHandler<NewMessageEventArgs> clickNewMessageEvent;
-    public Text nameText;
-    public Text messageText;//TODO 超過長度
+    public TextMeshProUGUI nameText;
+    public TextMeshProUGUI messageText;//TODO 超過長度
     public Image headImage;
 
     const float WAITING_TIME = 3.0f;
