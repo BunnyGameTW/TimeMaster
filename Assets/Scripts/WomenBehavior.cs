@@ -37,18 +37,28 @@ public class AudioEventArgs : EventArgs
         responseType = type;
     }
 }
+
+public class PitchEventArgs: EventArgs
+{
+    public int i;
+    public PitchEventArgs(int level)
+    {
+        i = level;
+    }
+}
+
 public class WomenBehavior : MonoBehaviour
 {
     const float ASK_QUESTION_TIME = 6.0f;
     const float IDLE_TIME = 6.0f;
-    const int IDLE_SCORE = 15;
-    const int WRONG_ANSWER_SCORE = 10;
+    const int IDLE_SCORE = 0;
+    const int WRONG_ANSWER_SCORE = 20;
     const float MIN_START_TIME = 0.0f;
     const float MAX_START_TIME = 5.0f;
     const int UNREAD_INDEX = -1;
     const int MIN_SCORE = 0;
     const int MAX_SCORE = 100;
-
+    readonly int [] WARNING_SCORE = { 40, 60, 80 };
 
     WomenInfo data;
     List<WomenQuestion> questionData;
@@ -75,8 +85,10 @@ public class WomenBehavior : MonoBehaviour
     public event EventHandler<MessageEvenArgs> showMessageEvent;
     public event EventHandler<AudioEventArgs> audioEvent;
     public event EventHandler<EventArgs> gameOverEvent;
+    public event EventHandler<PitchEventArgs> changePitchEvent;
 
     
+
 
     void Start()
     {
@@ -260,6 +272,16 @@ public class WomenBehavior : MonoBehaviour
         {
             score = 0;
         }
+
+        for (int i = WARNING_SCORE.Length - 1; i >= 0; i--)
+        {
+            if (score >= WARNING_SCORE[i])
+            {
+                changePitchEvent?.Invoke(this, new PitchEventArgs(i));
+                break;
+            }
+        }
+ 
     }
 
     void AddCoolDownTime(float time)//TODO?

@@ -60,7 +60,8 @@ public class GameManager : MonoBehaviour
     const string PLAYER_PHOTO_FILE_NAME = "player_photo";
     const float GAME_TIME = 60.0f;
     const string HAPPY_END_STRING = "你精通了時間管理術\n持續徜徉於多人聊天運動的快樂中";
-
+    readonly float [] PITCH_LEVEL = { 1.2f, 1.5f, 2.0f };
+    const float CHANGE_PITCH_RATIO = 0.2f;
     float CARD_TOTAL_WIDTH;
 
     List<Card> cardData;
@@ -83,20 +84,24 @@ public class GameManager : MonoBehaviour
     List<GameObject> friendList;
     List<WomenBehavior> womenList;
     List<ChatCellBehavior> chatList;
-    AudioSource audioSource;
-
-
+    AudioSource audioSource, bgmAudioSource;
+    float nowPitch;
+    int pitchLevel;
+    bool isChangePitch;
     void Start()
     {
         gameState = State.FRIEND;
         timer = 0.0f;
         secondTime = Mathf.Infinity;
-        isGameOver = false;
+        isChangePitch = isGameOver = false;
         cardData = excelData.cardTable;
         womenIndex = NO_WOMEN_INDEX;
+        pitchLevel = -1;
         randomCardList = new List<Card>();
         chatList = new List<ChatCellBehavior>();
         audioSource = GetComponent<AudioSource>();
+        bgmAudioSource = Camera.main.GetComponent<AudioSource>();
+        nowPitch = audioSource.pitch;
         changeBackgroundSlider.onValueChanged.AddListener(delegate { OnSliderValueChanged(); });
         InitPlayerCards();
         InitScrollViewDictionary();
@@ -125,6 +130,15 @@ public class GameManager : MonoBehaviour
             {
                 isGameOver = true;
                 GameOver(NO_WOMEN_INDEX, GetScore());
+            }
+            if (isChangePitch)
+            {
+                nowPitch += Time.deltaTime * CHANGE_PITCH_RATIO;
+                if(nowPitch >= PITCH_LEVEL[pitchLevel])
+                {
+                    isChangePitch = false;
+                }
+                ChangePitch();
             }
         }
     }
@@ -272,6 +286,22 @@ public class GameManager : MonoBehaviour
         GameOver(women.GetData().id, GetScore());
     }
 
+    void OnChangePitchEvent(object sender, PitchEventArgs param)
+    {
+        Debug.Log("param.i" + param.i);
+        if(param.i > pitchLevel)
+        {
+            pitchLevel = param.i;
+            isChangePitch = true;
+
+        }
+    }
+
+    void ChangePitch()
+    {
+        audioSource.pitch = nowPitch;
+        bgmAudioSource.pitch = nowPitch;
+    }
     void GameOver(int id, int score)
     {
         foreach (WomenBehavior item in womenList)
@@ -315,6 +345,7 @@ public class GameManager : MonoBehaviour
                 women.showMessageEvent += OnShowMessageEvent;
                 women.audioEvent += OnAudioEvent;
                 women.gameOverEvent += OnGameOverEvent;
+                women.changePitchEvent += OnChangePitchEvent;
                 womenList.Add(women);
             //}
         }
@@ -735,7 +766,7 @@ public class GameManager : MonoBehaviour
             NewMessageBehavior messageObject = Instantiate(newMessagePrefab, newMessageTransform).GetComponent<NewMessageBehavior>();
             messageObject.SetData(women.GetData(), messages[i]);
             messageObject.clickNewMessageEvent += OnNewMessageClickEvent;
-
+            messageObject.GetComponent<AudioSource>().pitch = nowPitch;
             women.AddUnreadNumber();
             UpdateChatList(women, messages[i], false);
 
