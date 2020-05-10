@@ -62,6 +62,7 @@ public class GameManager : MonoBehaviour
     const string HAPPY_END_STRING = "你精通了時間管理術\n持續徜徉於多人聊天運動的快樂中";
     readonly float [] PITCH_LEVEL = { 1.2f, 1.5f, 2.0f };
     const float CHANGE_PITCH_RATIO = 0.2f;
+    const float MULTIPLE_LINE_DELAY_TIME = 1.0f;
     float CARD_TOTAL_WIDTH;
 
     List<Card> cardData;
@@ -141,6 +142,15 @@ public class GameManager : MonoBehaviour
                 ChangePitch();
             }
         }
+        else
+        {
+            nowPitch -= Time.deltaTime * CHANGE_PITCH_RATIO;
+            if (nowPitch <= 1)
+            {
+                nowPitch = 1;
+            }
+            ChangePitch();
+        }
     }
 
     int GetScore()
@@ -162,7 +172,6 @@ public class GameManager : MonoBehaviour
         SwitchState();
     }
 
-    //TODO
     void OnSliderValueChanged()
     {
         if(changeBackgroundSlider.value == 0.0f)
@@ -237,7 +246,7 @@ public class GameManager : MonoBehaviour
         if (women.GetData().id == womenIndex)
         {
             UpdateScore();
-            ShowInRoomMessage(param.message.type, param.message.id, false);
+            ShowInRoomMessages(param.message.type, param.message.id, false);
         }
         else
         {
@@ -263,32 +272,21 @@ public class GameManager : MonoBehaviour
         SwitchState();
     }
 
-    void CheckNewMessageObject(int id)
-    {
-        foreach (Transform item in newMessageTransform)
-        {
-            if(item.GetComponent<NewMessageBehavior>().GetWomenId() == id)
-            {
-                Destroy(item.gameObject);
-            }
-        }
-    }
-
     void OnAudioEvent(object sender, AudioEventArgs param)
     {
-        audioSource.PlayOneShot(param.responseType == WomenResponseType.Wrong ? wrong: correct);
+        audioSource.PlayOneShot(param.responseType == WomenResponseType.Wrong ? wrong : correct);
     }
 
     void OnGameOverEvent(object sender, EventArgs param)
     {
         isGameOver = true;
+        
         WomenBehavior women = (WomenBehavior)sender;
         GameOver(women.GetData().id, GetScore());
     }
 
     void OnChangePitchEvent(object sender, PitchEventArgs param)
     {
-        Debug.Log("param.i" + param.i);
         if(param.i > pitchLevel)
         {
             pitchLevel = param.i;
@@ -297,36 +295,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void ChangePitch()
-    {
-        audioSource.pitch = nowPitch;
-        bgmAudioSource.pitch = nowPitch;
-    }
-    void GameOver(int id, int score)
-    {
-        foreach (WomenBehavior item in womenList)
-        {
-            item.SetGameOver();
-        }
-        Destroy(newMessageTransform.gameObject);
-        //TODO 有圖時要換
-        string fileName;
-        if (id == NO_WOMEN_INDEX)
-        {
-            fileName = "end_0";
-        }
-        else
-        {
-            fileName = id > 2 ? "to_be_continue" : string.Format("end_{0}", id);
-        }
-        
-        string charName = id == NO_WOMEN_INDEX ? "大師": womenList[id - 1].GetData().name;
-
-        endImage.sprite = Resources.Load <Sprite>(fileName);
-        endText.text = id == NO_WOMEN_INDEX ? HAPPY_END_STRING : excelData.womenTable[id - 1].end;
-        scoreText.text = charName + "結局：\n" + string.Format(scoreText.text, score);
-        endObject.SetActive(true);
-    }
 
     //private
     void InitWomenList()
@@ -334,7 +302,7 @@ public class GameManager : MonoBehaviour
         womenList = new List<WomenBehavior>();
         for (int i = 0; i < excelData.womenTable.Count; i++)
         {
-            //if (i <= 1)//TODO removed
+            //if (i < 1)//TODO removed
             //{
                 WomenBehavior women = Instantiate(womenPrefab).GetComponent<WomenBehavior>();
                 women.SetData(
@@ -434,13 +402,12 @@ public class GameManager : MonoBehaviour
             UpdateScore();
             GetTalkWomen().ResetUnreadNumber();
 
-            //TODO show unread line
             GetTalkWomen().SetFormatNameIndex(0);
             List<Message> list = GetTalkWomen().GetHistoryMessageList();
             foreach (Message item in list)
             {
                 SetCanUseCard(false);
-                ShowInRoomMessage(item.type, item.id, true);
+                ShowInRoomMessages(item.type, item.id, true);
             }
         }
     }
@@ -714,7 +681,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void ShowInRoomMessage(MessageType type, int id, bool isHistory)
+    void ShowInRoomMessages(MessageType type, int id, bool isHistory)
     {
         if (type == MessageType.Player)
         {
@@ -742,16 +709,39 @@ public class GameManager : MonoBehaviour
         {
             string[] messages = type == MessageType.WomenQuestion ? 
                 GetQuestionMessageString(id, GetTalkWomen(), isHistory) : GetResponseMessageString(id);
-            for (int i = 0; i < messages.Length; i++)
+            if (!isHistory)
             {
-                AddWomenMessage(messages[i]);
-                UpdateChatList(GetTalkWomen(), messages[i], true);
-
-                if (i == messages.Length - 1 && type == MessageType.WomenQuestion)
+                for (int i = 0; i < messages.Length; i++)
                 {
-                    SetCanUseCard(true);
+                    StartCoroutine(ShowInRoomMessage(MULTIPLE_LINE_DELAY_TIME * i, messages, i, type));
                 }
             }
+            else
+            {
+                for (int i = 0; i < messages.Length; i++)
+                {
+                    AddWomenMessage(messages[i]);
+                    UpdateChatList(GetTalkWomen(), messages[i], true);
+
+                    if (i == messages.Length - 1 && type == MessageType.WomenQuestion)
+                    {
+                        SetCanUseCard(true);
+                    }
+                }
+            }
+          
+        }
+    }
+
+    IEnumerator ShowInRoomMessage(float waitTime, string [] messages, int i, MessageType type)
+    {
+        yield return new WaitForSeconds(waitTime);
+        AddWomenMessage(messages[i]);
+        UpdateChatList(GetTalkWomen(), messages[i], true);
+
+        if (i == messages.Length - 1 && type == MessageType.WomenQuestion)
+        {
+            SetCanUseCard(true);
         }
     }
 
@@ -761,16 +751,20 @@ public class GameManager : MonoBehaviour
              GetQuestionMessageString(message.id, women, false) : GetResponseMessageString(message.id);
         for (int i = 0; i < messages.Length; i++)
         {
-            Debug.Log("show alert:" + women.GetData().name + "-> " + messages[i]);
-
-            NewMessageBehavior messageObject = Instantiate(newMessagePrefab, newMessageTransform).GetComponent<NewMessageBehavior>();
-            messageObject.SetData(women.GetData(), messages[i]);
-            messageObject.clickNewMessageEvent += OnNewMessageClickEvent;
-            messageObject.GetComponent<AudioSource>().pitch = nowPitch;
-            women.AddUnreadNumber();
-            UpdateChatList(women, messages[i], false);
-
+            StartCoroutine(ShowNewMessage(MULTIPLE_LINE_DELAY_TIME * i, women, messages, i));
         }
+    }
+
+    IEnumerator ShowNewMessage(float waitTime, WomenBehavior women, string [] messages, int i)
+    {
+        yield return new WaitForSeconds(waitTime);
+        NewMessageBehavior messageObject = Instantiate(newMessagePrefab, newMessageTransform).GetComponent<NewMessageBehavior>();
+        messageObject.SetData(women.GetData(), messages[i]);
+        messageObject.clickNewMessageEvent += OnNewMessageClickEvent;
+        messageObject.GetComponent<AudioSource>().pitch = nowPitch;
+        women.AddUnreadNumber();
+        UpdateChatList(women, messages[i], false);
+
     }
 
     void UpdateChatList(WomenBehavior women, string text, bool isTalkWomen)
@@ -781,7 +775,7 @@ public class GameManager : MonoBehaviour
         {
             Transform parent = chatScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
             chatCell = Instantiate(chatCellPrefab, parent).GetComponent<ChatCellBehavior>();
-            chatCell.SetData(women.GetData());
+            chatCell.SetData(women.GetData(), women);
             chatCell.clickEvent += OnChatCellClickEvent;
             chatList.Add(chatCell);
         }
@@ -808,7 +802,6 @@ public class GameManager : MonoBehaviour
         yield return new WaitForEndOfFrame();
         roomScrollViewObject.GetComponentInChildren<ScrollRect>().verticalNormalizedPosition = 0;
     }
-
    
     void SetCanUseCard(bool boolean)
     {
@@ -816,6 +809,51 @@ public class GameManager : MonoBehaviour
         {
             playerCards[i].GetComponent<CardBehavior>().SetCanUse(boolean);
         }
+    }
+
+
+    void CheckNewMessageObject(int id)
+    {
+        foreach (Transform item in newMessageTransform)
+        {
+            if (item.GetComponent<NewMessageBehavior>().GetWomenId() == id)
+            {
+                Destroy(item.gameObject);
+            }
+        }
+    }
+
+    void ChangePitch()
+    {
+        audioSource.pitch = nowPitch;
+        bgmAudioSource.pitch = nowPitch;
+    }
+
+    void GameOver(int id, int score)
+    {
+
+        foreach (WomenBehavior item in womenList)
+        {
+            item.SetGameOver();
+        }
+        Destroy(newMessageTransform.gameObject);
+        //TODO 有圖時要換
+        string fileName;
+        if (id == NO_WOMEN_INDEX)
+        {
+            fileName = "end_0";
+        }
+        else
+        {
+            fileName = id > 2 ? "to_be_continue" : string.Format("end_{0}", id);
+        }
+
+        string charName = id == NO_WOMEN_INDEX ? "大師" : womenList[id - 1].GetData().name;
+
+        endImage.sprite = Resources.Load<Sprite>(fileName);
+        endText.text = id == NO_WOMEN_INDEX ? HAPPY_END_STRING : excelData.womenTable[id - 1].end;
+        scoreText.text = charName + "結局：\n" + string.Format(scoreText.text, score);
+        endObject.SetActive(true);
     }
 
 }

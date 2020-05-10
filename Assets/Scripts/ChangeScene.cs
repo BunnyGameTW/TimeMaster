@@ -11,6 +11,7 @@ public class ChangeScene : MonoBehaviour
     {
         if(SceneManager.GetActiveScene().name == "Game")
         {
+            fadeImage.gameObject.SetActive(true);
             fadeImage.GetComponent<Animation>().Play("fadeOut");
             StartCoroutine(WaitAndInactive(fadeImage.GetComponent<Animation>().GetClip("fadeOut").length));
         }

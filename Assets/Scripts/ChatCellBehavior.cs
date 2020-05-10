@@ -12,9 +12,13 @@ public class ChatCellBehavior : MonoBehaviour
     public GameObject unreadObject;
     public TextMeshProUGUI unreadNumberText;
     public event EventHandler<EventArgs> clickEvent;
+    public Image timeBarImage;
+    public Color idleColor;
+    public Color waitResponseColor;
+    const int MAX_WORD_NUMBER = 24;
 
     WomenInfo womenInfo;
-
+    WomenBehavior womenData;
     float height;
     Vector3 originMousePosition;
     bool hasDrag;
@@ -50,14 +54,27 @@ public class ChatCellBehavior : MonoBehaviour
                 hasDrag = true;
             }
         }
+
+        if (womenData.GetHasAskQuestion())
+        {
+            timeBarImage.color = waitResponseColor;
+            timeBarImage.fillAmount = 1.0f - womenData.GetIdleTimer() / WomenBehavior.IDLE_TIME;
+        }
+        else
+        {
+            timeBarImage.color = idleColor;
+            timeBarImage.fillAmount = 1.0f - womenData.GetTimer() / WomenBehavior.ASK_QUESTION_TIME;
+
+        }
     }
 
 
-    public void SetData(WomenInfo info)
+    public void SetData(WomenInfo info, WomenBehavior women)
     {
         womenInfo = info;
         headImage.sprite = Resources.Load<Sprite>(info.fileName);
         nameText.text = info.name;
+        womenData = women;
     }
 
     public WomenInfo GetData()
@@ -68,7 +85,10 @@ public class ChatCellBehavior : MonoBehaviour
     //update unread number and text
     public void UpdateUI(string text, int unreadNumber)
     {
-        chatText.text = text;//TODO 檢查超過長度
+        if (text.Length > MAX_WORD_NUMBER)
+            chatText.text = text.Substring(0, MAX_WORD_NUMBER) + "...";
+        else
+            chatText.text = text;//TODO 檢查超過長度
         unreadObject.SetActive(unreadNumber != 0);
         unreadNumberText.text = unreadNumber.ToString();
     }

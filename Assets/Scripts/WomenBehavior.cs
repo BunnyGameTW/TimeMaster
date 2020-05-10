@@ -49,16 +49,19 @@ public class PitchEventArgs: EventArgs
 
 public class WomenBehavior : MonoBehaviour
 {
-    const float ASK_QUESTION_TIME = 6.0f;
-    const float IDLE_TIME = 6.0f;
-    const int IDLE_SCORE = 0;
-    const int WRONG_ANSWER_SCORE = 20;
+    public const float ASK_QUESTION_TIME = 6.0f;
+    public const float IDLE_TIME = 6.0f;
+    const int IDLE_SCORE = 15;
+    const int WRONG_ANSWER_SCORE = 10;
     const float MIN_START_TIME = 0.0f;
     const float MAX_START_TIME = 5.0f;
     const int UNREAD_INDEX = -1;
     const int MIN_SCORE = 0;
     const int MAX_SCORE = 100;
     readonly int [] WARNING_SCORE = { 40, 60, 80 };
+    const float AFTER_IDLE_DELAY_TIME = 1.0f;
+    const float RESPONSE_DELAY_TIME = 1.0f;
+
 
     WomenInfo data;
     List<WomenQuestion> questionData;
@@ -81,13 +84,13 @@ public class WomenBehavior : MonoBehaviour
     List<int> wrongResponseIdList = new List<int>();
     List<int> idleResponseIdList = new List<int>();
     List<string> formatNameList = new List<string>();
+    Card playerCard;
+
 
     public event EventHandler<MessageEvenArgs> showMessageEvent;
     public event EventHandler<AudioEventArgs> audioEvent;
     public event EventHandler<EventArgs> gameOverEvent;
     public event EventHandler<PitchEventArgs> changePitchEvent;
-
-    
 
 
     void Start()
@@ -145,7 +148,7 @@ public class WomenBehavior : MonoBehaviour
     }
 
 
-    public void AddUnreadNumber()//TODO多行訊息時看到一半離開
+    public void AddUnreadNumber()
     {
         if (unreadIndex != UNREAD_INDEX)
         {
@@ -200,33 +203,28 @@ public class WomenBehavior : MonoBehaviour
     {
         isGameOver = true;
     }
+
+    public float GetTimer()
+    {
+        return timer;
+    }
+
+    public float GetIdleTimer()
+    {
+        return idleTimer;
+    }
+
+    public bool GetHasAskQuestion()
+    {
+        return hasAskQuestion;
+    }
     //event
     public void OnPlayCardEvent(Card card)
     {
         hasAskQuestion = false;
         timer = 0;
-
-        //response
-        MatchInfo info = GetMatchResponse(card);
-        if (info != null)
-        {
-            AddScore(info.addScore);
-            AddCoolDownTime(info.cdTime);
-            AddMessage(info.responseId, MessageType.WomenResponse);
-            if (info.hasMultipleQuestion)
-            {
-                AskQuestion(info.nextQuestionId);
-            }
-            audioEvent?.Invoke(this, new AudioEventArgs(WomenResponseType.Normal));
-        }
-        else
-        {
-            int responseId = wrongResponseIdList[UnityEngine.Random.Range(0, wrongResponseIdList.Count)];
-            audioEvent?.Invoke(this, new AudioEventArgs(WomenResponseType.Wrong));
-            AddScore(WRONG_ANSWER_SCORE);
-            AddMessage(responseId, MessageType.WomenResponse);
-        }
-
+        playerCard = card;
+        StartCoroutine(Response(RESPONSE_DELAY_TIME));
     }
     
     //private
@@ -347,7 +345,7 @@ public class WomenBehavior : MonoBehaviour
         {
             hasAskQuestion = false;
             idleTimer = 0;
-            timer = ASK_QUESTION_TIME;
+            timer = ASK_QUESTION_TIME - AFTER_IDLE_DELAY_TIME;
             int responseId = idleResponseIdList[UnityEngine.Random.Range(0, idleResponseIdList.Count)];
             AddMessage(responseId, MessageType.WomenResponse);
             AddScore(IDLE_SCORE);
@@ -363,10 +361,43 @@ public class WomenBehavior : MonoBehaviour
         }
         else if (timer > ASK_QUESTION_TIME)
         {
+            int index = UnityEngine.Random.Range(0, randomQuestionList.Count);
             hasAskQuestion = true;
             idleTimer = 0;
-            int index = UnityEngine.Random.Range(0, randomQuestionList.Count);
             AskQuestion(randomQuestionList[index]);
+        }
+    }
+
+
+    IEnumerator AskNextQuestion(int id)
+    {
+        yield return new WaitForSeconds(RESPONSE_DELAY_TIME);
+        hasAskQuestion = true;
+        idleTimer = 0;
+        AskQuestion(id);
+    }
+
+    IEnumerator Response(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        MatchInfo info = GetMatchResponse(playerCard);
+        if (info != null)
+        {
+            AddScore(info.addScore);
+            AddCoolDownTime(info.cdTime);
+            AddMessage(info.responseId, MessageType.WomenResponse);
+            audioEvent?.Invoke(this, new AudioEventArgs(WomenResponseType.Normal));
+            if (info.hasMultipleQuestion)
+            {
+                StartCoroutine(AskNextQuestion(info.nextQuestionId));
+            }
+        }
+        else
+        {
+            int responseId = wrongResponseIdList[UnityEngine.Random.Range(0, wrongResponseIdList.Count)];
+            audioEvent?.Invoke(this, new AudioEventArgs(WomenResponseType.Wrong));
+            AddScore(WRONG_ANSWER_SCORE);
+            AddMessage(responseId, MessageType.WomenResponse);
         }
     }
 }
