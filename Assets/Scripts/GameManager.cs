@@ -63,6 +63,7 @@ public class GameManager : MonoBehaviour
     readonly float [] PITCH_LEVEL = { 1.2f, 1.5f, 2.0f };
     const float CHANGE_PITCH_RATIO = 0.2f;
     const float MULTIPLE_LINE_DELAY_TIME = 1.0f;
+    const int MAX_IN_ROOM_TEXT_NUMBER = 20;
     float CARD_TOTAL_WIDTH;
 
     List<Card> cardData;
@@ -190,8 +191,6 @@ public class GameManager : MonoBehaviour
     void OnPlayCardEvent(object sender, CardEventArgs param)
     {
         Card cardData = param.cardData;
-        Debug.Log(cardData.description);
-        Debug.Log(cardData.id);
         SetCanUseCard(false);
 
         GetTalkWomen().AddMessage(cardData.id, MessageType.Player);
@@ -655,25 +654,6 @@ public class GameManager : MonoBehaviour
         return cell;
     }
 
-    //format women accept card id
-    //void InitFormatCardId()
-    //{
-    //    for (int i = 0; i < womenQuestionDatas.Length; i++)
-    //    {
-    //        foreach (var item in womenQuestionDatas[i])
-    //        {
-    //            string[] strs = item.cardsId.Split(FORMAT_ACCEPT_CARD_CHARACTER);
-    //            item.cardId = new int [strs.Length];
-    //            for (int j = 0; j < strs.Length; j++)
-    //            {
-    //                item.cardId[j] = Convert.ToInt32(strs[j]);
-    //            }
-    //        }
-    //    }
-    //}
-
-   
-
     void DeleteCard(CardBehavior card)
     {
         Destroy(card.gameObject);
@@ -691,6 +671,15 @@ public class GameManager : MonoBehaviour
             if(card.type == CardType.Text)
             {
                 GameObject gameObject = Instantiate(roomMeTextPrefab, parent);
+                if (card.description.Length > MAX_IN_ROOM_TEXT_NUMBER)
+                {
+                    int number = Mathf.FloorToInt(card.description.Length / MAX_IN_ROOM_TEXT_NUMBER);
+                    for (int i = 0; i < number; i++)
+                    {
+                        card.description = card.description.Insert(MAX_IN_ROOM_TEXT_NUMBER * (i + 1) - 1 + i, "\n");
+                        Debug.Log(card.description);
+                    }
+                }
                 gameObject.GetComponentInChildren<TextMeshProUGUI>().text = card.description;
             }
             else
@@ -784,11 +773,19 @@ public class GameManager : MonoBehaviour
         //reorder list
         chatCell.gameObject.transform.SetAsFirstSibling();
     }
-
     void AddWomenMessage(string text)
     {
         Transform parent = roomScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
         GameObject gameObject = Instantiate(roomGirlPrefab, parent);
+        if (text.Length > MAX_IN_ROOM_TEXT_NUMBER)
+        {
+            int number = Mathf.FloorToInt(text.Length / MAX_IN_ROOM_TEXT_NUMBER);
+            for (int i = 0; i < number; i++)
+            {
+
+                text = text.Insert(MAX_IN_ROOM_TEXT_NUMBER * (i + 1) - 1 + i, "\n");
+            }
+        }
         gameObject.GetComponentInChildren<TextMeshProUGUI>().text = text;
         gameObject.GetComponentsInChildren<Image>()[1].sprite = Resources.Load<Sprite>(GetTalkWomen().GetData().fileName);
         StartCoroutine(AutoScroll());

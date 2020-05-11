@@ -16,10 +16,12 @@ public class NewMessageBehavior : MonoBehaviour
 {
     public event EventHandler<NewMessageEventArgs> clickNewMessageEvent;
     public TextMeshProUGUI nameText;
-    public TextMeshProUGUI messageText;//TODO 超過長度
+    public TextMeshProUGUI messageText;
     public Image headImage;
 
     const float WAITING_TIME = 3.0f;
+    const int MAX_TEXT_LENGTH = 13;
+
     float timer;
     Animation ani;
     bool isDisappear;
@@ -48,7 +50,12 @@ public class NewMessageBehavior : MonoBehaviour
     public void SetData(WomenInfo info, string message)
     {
         nameText.text = info.name;
-        messageText.text = message;
+        if (message.Contains("\n"))
+            messageText.text = message.Substring(0, message.IndexOf('\n')) + "...";
+        else if (message.Length >= MAX_TEXT_LENGTH)
+            messageText.text = message.Substring(0, MAX_TEXT_LENGTH) + "...";
+        else
+            messageText.text = message;
         headImage.sprite = Resources.Load<Sprite>(info.fileName);
         womenId = info.id;
     }

@@ -15,7 +15,7 @@ public class ChatCellBehavior : MonoBehaviour
     public Image timeBarImage;
     public Color idleColor;
     public Color waitResponseColor;
-    const int MAX_WORD_NUMBER = 24;
+    const int MAX_TEXT_LENGTH = 24;
 
     WomenInfo womenInfo;
     WomenBehavior womenData;
@@ -85,10 +85,10 @@ public class ChatCellBehavior : MonoBehaviour
     //update unread number and text
     public void UpdateUI(string text, int unreadNumber)
     {
-        if (text.Length > MAX_WORD_NUMBER)
-            chatText.text = text.Substring(0, MAX_WORD_NUMBER) + "...";
+        if (text.Length > MAX_TEXT_LENGTH)
+            chatText.text = text.Substring(0, MAX_TEXT_LENGTH) + "...";
         else
-            chatText.text = text;//TODO 檢查超過長度
+            chatText.text = text;
         unreadObject.SetActive(unreadNumber != 0);
         unreadNumberText.text = unreadNumber.ToString();
     }

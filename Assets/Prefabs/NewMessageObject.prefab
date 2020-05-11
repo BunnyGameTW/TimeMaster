@@ -438,7 +438,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: NameNameNameNameNameNa...
+  m_text: "\u4E00\u4E8C\u4E09\u56DB\u4E94\u4E00\u4E8C\u4E09\u56DB\u4E94\u4E00\u4E8C\u4E09\u56DB\u4E94\u4E00\u4E8C\u4E09\u56DB\u4E94"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9e07a65f9289f1c4fb9b8d463e2c7f5f, type: 2}
   m_sharedMaterial: {fileID: 8479832750456992933, guid: 9e07a65f9289f1c4fb9b8d463e2c7f5f,
@@ -474,7 +474,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_textAlignment: 257
+  m_textAlignment: 513
   m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: 0
@@ -508,10 +508,10 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_textInfo:
     textComponent: {fileID: 16503658}
-    characterCount: 25
+    characterCount: 20
     spriteCount: 0
     spaceCount: 0
-    wordCount: 1
+    wordCount: 4
     linkCount: 0
     lineCount: 1
     pageCount: 1
@@ -787,7 +787,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 200}
-  m_SizeDelta: {x: -100, y: 200}
+  m_SizeDelta: {x: -100, y: 180}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!111 &4832962492209376493
 Animation:
