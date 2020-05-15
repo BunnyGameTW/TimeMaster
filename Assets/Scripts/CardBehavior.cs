@@ -28,6 +28,9 @@ public class CardBehavior : MonoBehaviour
     public event EventHandler<CardEventArgs> playCardEvent;
     public event EventHandler<CardEventArgs> pointerEnterEvent;
     public event EventHandler<CardEventArgs> pointerExitEvent;
+    public event EventHandler<CardEventArgs> pointerUpEvent;
+
+    
 
     // Start is called before the first frame update
     void Start()
@@ -92,6 +95,7 @@ public class CardBehavior : MonoBehaviour
         if (canUse)
         {
             hasPointerDown = true;
+            //TODO invoke click card event
         }
     }
 
@@ -118,8 +122,7 @@ public class CardBehavior : MonoBehaviour
             }
             else
             {
-                //TODO reset position
-                pointerExitEvent?.Invoke(this, new CardEventArgs());
+                pointerUpEvent?.Invoke(this, new CardEventArgs());
             }
             hasPointerDown = false;
         }

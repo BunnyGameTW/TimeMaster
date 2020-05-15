@@ -90,6 +90,8 @@ public class GameManager : MonoBehaviour
     float nowPitch;
     int pitchLevel;
     bool isChangePitch;
+
+    RoomSwipe roomSwipe;
     void Start()
     {
         gameState = State.FRIEND;
@@ -105,6 +107,10 @@ public class GameManager : MonoBehaviour
         bgmAudioSource = Camera.main.GetComponent<AudioSource>();
         nowPitch = audioSource.pitch;
         changeBackgroundSlider.onValueChanged.AddListener(delegate { OnSliderValueChanged(); });
+        roomSwipe = roomObject.GetComponent<RoomSwipe>();
+        roomSwipe.moveEndEvent += OnRoomSwipeMoveEnd;
+        roomSwipe.hideCardEvent += OnHideCardEvent;
+
         InitPlayerCards();
         InitScrollViewDictionary();
         InitTitleDictionary();
@@ -168,9 +174,9 @@ public class GameManager : MonoBehaviour
     public void OnBackButtonClicked()
     {
         audioSource.PlayOneShot(click);
-        gameState = State.CHAT;
         womenIndex = NO_WOMEN_INDEX;
-        SwitchState();
+        roomSwipe.SetMoveOut();
+        cardObjectTransform.gameObject.SetActive(false);
     }
 
     void OnSliderValueChanged()
@@ -200,17 +206,34 @@ public class GameManager : MonoBehaviour
         DeleteCard((CardBehavior)sender);
         playerCards.Add(GetCard());
         UpdatePlayerCards();
+
+        //set can swipe
+        StartCoroutine(DelaySetCanSwipe(0.5f));
     }
 
-    //TODO
+    IEnumerator DelaySetCanSwipe(float time)
+    {
+        yield return new WaitForSeconds(time);
+        roomSwipe.SetCanSwipe(true);
+
+    }
+    //TODO 改寫換parent方法
     void OnCardEnterEvent(object sender, CardEventArgs param)
     {
         CardBehavior cardModel = (CardBehavior)sender;
         //cardModel.transform.SetAsFirstSibling();
         cardModel.transform.SetParent(selectCardTransform);
+        roomSwipe.SetCanSwipe(false);
     }
 
     void OnCardExitEvent(object sender, CardEventArgs param)
+    {
+        UpdatePlayerCards();
+        roomSwipe.SetCanSwipe(true);
+
+    }
+
+    void OnCardPointerUpEvent(object sender, CardEventArgs param)
     {
         UpdatePlayerCards();
     }
@@ -234,9 +257,8 @@ public class GameManager : MonoBehaviour
     {
         audioSource.PlayOneShot(click);
         FriendCellBehavior friendCell = (FriendCellBehavior)sender;
-        gameState = State.ROOM;
         womenIndex = friendCell.GetData().id;
-        SwitchState();
+        roomSwipe.SetMoveIn();
     }
 
     void OnShowMessageEvent(object sender, MessageEvenArgs param)
@@ -257,9 +279,8 @@ public class GameManager : MonoBehaviour
     {
         audioSource.PlayOneShot(click);
         ChatCellBehavior chatCell = (ChatCellBehavior)sender;
-        gameState = State.ROOM;
         womenIndex = chatCell.GetData().id;
-        SwitchState();
+        roomSwipe.SetMoveIn();
     }
 
     void OnNewMessageClickEvent(object sender, NewMessageEventArgs param)
@@ -267,6 +288,9 @@ public class GameManager : MonoBehaviour
         CheckNewMessageObject(param.womenId);
         audioSource.PlayOneShot(click);
         womenIndex = param.womenId;
+        roomScrollViewObject.transform.localPosition = new Vector3(0, roomScrollViewObject.transform.localPosition.y, 0);
+        roomObject.transform.localPosition = new Vector3(0, 0, 0);
+        roomSwipe.SetCanSwipe(true);
         gameState = State.ROOM;
         SwitchState();
     }
@@ -290,10 +314,23 @@ public class GameManager : MonoBehaviour
         {
             pitchLevel = param.i;
             isChangePitch = true;
-
         }
     }
 
+    void OnRoomSwipeMoveEnd(object sender, EventArgs param)
+    {
+        gameState = gameState == State.ROOM ? State.CHAT : State.ROOM;
+        if(gameState != State.ROOM)
+        {
+            roomSwipe.SetCanSwipe(false);
+        }
+        SwitchState();
+    }
+
+    void OnHideCardEvent(object sender, EventArgs param)
+    {
+        cardObjectTransform.gameObject.SetActive(false);
+    }
 
     //private
     void InitWomenList()
@@ -301,8 +338,8 @@ public class GameManager : MonoBehaviour
         womenList = new List<WomenBehavior>();
         for (int i = 0; i < excelData.womenTable.Count; i++)
         {
-            //if (i < 1)//TODO removed
-            //{
+            if (i < 1)//TODO removed
+            {
                 WomenBehavior women = Instantiate(womenPrefab).GetComponent<WomenBehavior>();
                 women.SetData(
                     excelData.womenTable[i],
@@ -314,7 +351,7 @@ public class GameManager : MonoBehaviour
                 women.gameOverEvent += OnGameOverEvent;
                 women.changePitchEvent += OnChangePitchEvent;
                 womenList.Add(women);
-            //}
+            }
         }
     }
 
@@ -364,7 +401,7 @@ public class GameManager : MonoBehaviour
     {
         scrollViewDictionary = new Dictionary<State, GameObject>();
         scrollViewDictionary.Add(State.CHAT, chatScrollViewObject);
-        scrollViewDictionary.Add(State.ROOM, roomScrollViewObject);
+        //scrollViewDictionary.Add(State.ROOM, roomScrollViewObject);
         scrollViewDictionary.Add(State.FRIEND, freindScrollViewObject);
     }
 
@@ -388,7 +425,7 @@ public class GameManager : MonoBehaviour
         navBarObject.SetActive(gameState != State.ROOM);
         cardObjectTransform.gameObject.SetActive(gameState == State.ROOM);
         selectCardTransform.gameObject.SetActive(gameState == State.ROOM);
-        roomObject.SetActive(gameState == State.ROOM);
+
         settingObject.SetActive(gameState == State.SETTING);
 
         if(gameState == State.ROOM)
@@ -428,7 +465,7 @@ public class GameManager : MonoBehaviour
             pair.Value.SetActive(false);
         }
 
-        if (gameState != State.SETTING)
+        if (gameState != State.SETTING && gameState != State.ROOM)
         {
             scrollViewDictionary[gameState].SetActive(true);
         }
@@ -570,6 +607,7 @@ public class GameManager : MonoBehaviour
 
     WomenBehavior GetTalkWomen()
     {
+        //Debug.Log("womenIndex" + womenIndex);
         return womenList[womenIndex - 1];
     }
 
@@ -608,6 +646,9 @@ public class GameManager : MonoBehaviour
         gameObject.GetComponent<CardBehavior>().playCardEvent += OnPlayCardEvent;
         gameObject.GetComponent<CardBehavior>().pointerEnterEvent += OnCardEnterEvent;
         gameObject.GetComponent<CardBehavior>().pointerExitEvent += OnCardExitEvent;
+        gameObject.GetComponent<CardBehavior>().pointerUpEvent += OnCardPointerUpEvent;
+
+        
         return gameObject;
     }
 
@@ -834,6 +875,7 @@ public class GameManager : MonoBehaviour
             item.SetGameOver();
         }
         Destroy(newMessageTransform.gameObject);
+
         //TODO 有圖時要換
         string fileName;
         if (id == NO_WOMEN_INDEX)
