@@ -13,7 +13,7 @@ public class CardBehavior : MonoBehaviour
 {
     public TextMeshProUGUI descriptionText;
     public Image image;
-
+    public Color activeColor;
     const float MOVE_OFFSET_Y = 100.0f;
     const float PLAY_CARD_POSITION_Y = 0;
     const float SCALE_RATIO = 1.5f;
@@ -50,7 +50,7 @@ public class CardBehavior : MonoBehaviour
     public void SetCanUse(bool boolean)
     {
         canUse = boolean;
-        backgroundImage.color = boolean ? Color.white : Color.gray;
+        backgroundImage.color = boolean ? activeColor : Color.gray;
     }
 
     public void UpdatePosition(Vector3 position)

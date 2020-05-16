@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
     const int NO_WOMEN_INDEX = -1;
     const char FORMAT_ACCEPT_CARD_CHARACTER = ',';
     const int START_CARD_NUMBER = 3;
-    const float CARD_START_POSITION_Y = -800.0f;
+    const float CARD_START_POSITION_Y = -750.0f;
     const float CARD_PADDING = 0.0f;
     const float MAX_SCORE = 100.0f;
     const string FIREND_TITLE = "朋友";
