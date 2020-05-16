@@ -11,7 +11,7 @@ public class RoomSwipe : MonoBehaviour
     const float MOVE_SPEED = 5000.0f;
     const float SCREEN_WIDTH = 1080.0f;
     const float MIN_DRAG_OFFSET = 50.0f;
-
+    const float ORIGIN_POSITION_X = 9999.0f;
     float originMousePositionX, originMousePositionY;
     float targetX;
     bool isMove, hasPointerDown, canSwipe, needInvokeEvent, isSwipe;
@@ -25,7 +25,7 @@ public class RoomSwipe : MonoBehaviour
     void Start()
     {
         isMove = hasPointerDown = false;
-        originMousePositionX = 0;
+        originMousePositionX = ORIGIN_POSITION_X;
         canSwipe = false;
         needInvokeEvent = true;
         isSwipe = false;
@@ -89,7 +89,8 @@ public class RoomSwipe : MonoBehaviour
             }
             else
             {
-                moveEndEvent?.Invoke(this, EventArgs.Empty);//TODO
+                Debug.Log("moveEndEvent");
+                moveEndEvent?.Invoke(this, EventArgs.Empty);
             }
         }
     }
@@ -98,6 +99,7 @@ public class RoomSwipe : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            Debug.Log("Input.GetMouseButtonDown(0)");
             float min = -SCREEN_WIDTH / 2;
             float max = SCREEN_WIDTH / 2;
             transform.localPosition = new Vector3(min, 0, 0);
@@ -117,6 +119,7 @@ public class RoomSwipe : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            Debug.Log("Input.GetMouseButtonUp(0)");
             float offsetX = Mathf.Abs(Input.mousePosition.x - originMousePositionX);
             float offsetY = Mathf.Abs(Input.mousePosition.y - originMousePositionY);
             if (offsetY > offsetX || (offsetX == 0 && offsetY == 0))
@@ -124,6 +127,7 @@ public class RoomSwipe : MonoBehaviour
             if (Input.mousePosition.x - originMousePositionX >= SWIPE_DISTANCE)
             {
                 SetMoveOut();
+                originMousePositionX = ORIGIN_POSITION_X;
                 hideCardEvent?.Invoke(this, EventArgs.Empty);
             }
             else

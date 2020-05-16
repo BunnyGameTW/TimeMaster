@@ -174,7 +174,7 @@ public class GameManager : MonoBehaviour
     public void OnBackButtonClicked()
     {
         audioSource.PlayOneShot(click);
-        womenIndex = NO_WOMEN_INDEX;
+        
         roomSwipe.SetMoveOut();
         cardObjectTransform.gameObject.SetActive(false);
     }
@@ -320,8 +320,10 @@ public class GameManager : MonoBehaviour
     void OnRoomSwipeMoveEnd(object sender, EventArgs param)
     {
         gameState = gameState == State.ROOM ? State.CHAT : State.ROOM;
+        Debug.Log("gameState->" + gameState.ToString());
         if(gameState != State.ROOM)
         {
+            womenIndex = NO_WOMEN_INDEX;
             roomSwipe.SetCanSwipe(false);
         }
         SwitchState();
@@ -338,7 +340,7 @@ public class GameManager : MonoBehaviour
         womenList = new List<WomenBehavior>();
         for (int i = 0; i < excelData.womenTable.Count; i++)
         {
-            if (i < 1)//TODO removed
+            if (i < 2)//TODO removed
             {
                 WomenBehavior women = Instantiate(womenPrefab).GetComponent<WomenBehavior>();
                 women.SetData(
@@ -712,16 +714,16 @@ public class GameManager : MonoBehaviour
             if(card.type == CardType.Text)
             {
                 GameObject gameObject = Instantiate(roomMeTextPrefab, parent);
-                if (card.description.Length > MAX_IN_ROOM_TEXT_NUMBER)
+                string description = card.description;
+                if (description.Length > MAX_IN_ROOM_TEXT_NUMBER)
                 {
-                    int number = Mathf.FloorToInt(card.description.Length / MAX_IN_ROOM_TEXT_NUMBER);
+                    int number = Mathf.FloorToInt(description.Length / MAX_IN_ROOM_TEXT_NUMBER);
                     for (int i = 0; i < number; i++)
                     {
-                        card.description = card.description.Insert(MAX_IN_ROOM_TEXT_NUMBER * (i + 1) - 1 + i, "\n");
-                        Debug.Log(card.description);
+                        description = description.Insert(MAX_IN_ROOM_TEXT_NUMBER * (i + 1) - 1 + i, "\n");
                     }
                 }
-                gameObject.GetComponentInChildren<TextMeshProUGUI>().text = card.description;
+                gameObject.GetComponentInChildren<TextMeshProUGUI>().text = description;
             }
             else
             {
@@ -818,16 +820,17 @@ public class GameManager : MonoBehaviour
     {
         Transform parent = roomScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
         GameObject gameObject = Instantiate(roomGirlPrefab, parent);
-        if (text.Length > MAX_IN_ROOM_TEXT_NUMBER)
+        string description = text;
+        if (description.Length > MAX_IN_ROOM_TEXT_NUMBER)
         {
-            int number = Mathf.FloorToInt(text.Length / MAX_IN_ROOM_TEXT_NUMBER);
+            int number = Mathf.FloorToInt(description.Length / MAX_IN_ROOM_TEXT_NUMBER);
             for (int i = 0; i < number; i++)
             {
 
-                text = text.Insert(MAX_IN_ROOM_TEXT_NUMBER * (i + 1) - 1 + i, "\n");
+                description = description.Insert(MAX_IN_ROOM_TEXT_NUMBER * (i + 1) - 1 + i, "\n");
             }
         }
-        gameObject.GetComponentInChildren<TextMeshProUGUI>().text = text;
+        gameObject.GetComponentInChildren<TextMeshProUGUI>().text = description;
         gameObject.GetComponentsInChildren<Image>()[1].sprite = Resources.Load<Sprite>(GetTalkWomen().GetData().fileName);
         StartCoroutine(AutoScroll());
     }
@@ -875,6 +878,10 @@ public class GameManager : MonoBehaviour
             item.SetGameOver();
         }
         Destroy(newMessageTransform.gameObject);
+
+        //TODO change in fail women room and show angry or show time
+        //end object fade in
+        //
 
         //TODO 有圖時要換
         string fileName;
