@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
     public Sprite normalBackground, nakedBackground;
     public Image backgroundImage;
     public GameObject settingObject;
+    public Image endFadeImage;
 
     const int WOMEN_NUMBER = 2;
     const int NO_WOMEN_INDEX = -1;
@@ -215,8 +216,8 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         roomSwipe.SetCanSwipe(true);
-
     }
+
     //TODO 改寫換parent方法
     void OnCardEnterEvent(object sender, CardEventArgs param)
     {
@@ -258,6 +259,7 @@ public class GameManager : MonoBehaviour
         audioSource.PlayOneShot(click);
         FriendCellBehavior friendCell = (FriendCellBehavior)sender;
         womenIndex = friendCell.GetData().id;
+        CheckNewMessageObject(womenIndex);
         roomSwipe.SetMoveIn();
     }
 
@@ -280,6 +282,7 @@ public class GameManager : MonoBehaviour
         audioSource.PlayOneShot(click);
         ChatCellBehavior chatCell = (ChatCellBehavior)sender;
         womenIndex = chatCell.GetData().id;
+        CheckNewMessageObject(womenIndex);
         roomSwipe.SetMoveIn();
     }
 
@@ -320,7 +323,6 @@ public class GameManager : MonoBehaviour
     void OnRoomSwipeMoveEnd(object sender, EventArgs param)
     {
         gameState = gameState == State.ROOM ? State.CHAT : State.ROOM;
-        Debug.Log("gameState->" + gameState.ToString());
         if(gameState != State.ROOM)
         {
             womenIndex = NO_WOMEN_INDEX;
@@ -403,7 +405,6 @@ public class GameManager : MonoBehaviour
     {
         scrollViewDictionary = new Dictionary<State, GameObject>();
         scrollViewDictionary.Add(State.CHAT, chatScrollViewObject);
-        //scrollViewDictionary.Add(State.ROOM, roomScrollViewObject);
         scrollViewDictionary.Add(State.FRIEND, freindScrollViewObject);
     }
 
@@ -878,10 +879,15 @@ public class GameManager : MonoBehaviour
             item.SetGameOver();
         }
         Destroy(newMessageTransform.gameObject);
+        roomSwipe.SetCanSwipe(false);
 
         //TODO change in fail women room and show angry or show time
         //end object fade in
         //
+       
+        Animation ani = endFadeImage.GetComponent<Animation>();
+        ani.Play();
+        StartCoroutine(ShowEnd(ani.clip.length / 2));
 
         //TODO 有圖時要換
         string fileName;
@@ -895,12 +901,14 @@ public class GameManager : MonoBehaviour
         }
 
         string charName = id == NO_WOMEN_INDEX ? "大師" : womenList[id - 1].GetData().name;
-
         endImage.sprite = Resources.Load<Sprite>(fileName);
         endText.text = id == NO_WOMEN_INDEX ? HAPPY_END_STRING : excelData.womenTable[id - 1].end;
         scoreText.text = charName + "結局：\n" + string.Format(scoreText.text, score);
+    }
+    IEnumerator ShowEnd(float time)
+    {
+        yield return new WaitForSeconds(time);
         endObject.SetActive(true);
     }
-
 }
 
