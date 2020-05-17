@@ -51,10 +51,7 @@ public class WomenBehavior : MonoBehaviour
 {
     public const float ASK_QUESTION_TIME = 6.0f;
     public const float IDLE_TIME = 6.0f;
-    const int IDLE_SCORE = 15;
-    const int WRONG_ANSWER_SCORE = 10;
-    const float MIN_START_TIME = 0.0f;
-    const float MAX_START_TIME = 5.0f;
+    const int MIN_START_TIME = 1;
     const int UNREAD_INDEX = -1;
     const int MIN_SCORE = 0;
     const int MAX_SCORE = 100;
@@ -69,13 +66,13 @@ public class WomenBehavior : MonoBehaviour
     List<MatchInfo> matchData;
 
     int score;
-    float timer, idleTimer;
-    float RANDOM_START_TIME;
+    float timer;
+    float randomStartTime;
     bool hasAskQuestion;
     int questionCounter;
     int unreadCounter;
     int questionId;
-    int unreadIndex;
+    int unreadIndex;//TODO 現在沒用到 指出從哪個訊息開始未讀的 但沒辦法分出多行訊息的哪行
     int formatNameIndex;
     bool isGameOver;
     List<Message> historyMessageList = new List<Message>();
@@ -85,18 +82,19 @@ public class WomenBehavior : MonoBehaviour
     List<int> idleResponseIdList = new List<int>();
     List<string> formatNameList = new List<string>();
     Card playerCard;
-
+    bool isFirstGetMinusAskTime;
+    float MINUS_TIME;//避免計時器扣冷卻之後負的顯示
 
     public event EventHandler<MessageEvenArgs> showMessageEvent;
     public event EventHandler<AudioEventArgs> audioEvent;
     public event EventHandler<EventArgs> gameOverEvent;
     public event EventHandler<PitchEventArgs> changePitchEvent;
-
+    public event EventHandler<EventArgs> cantUseCardEvent;
 
     void Start()
     {
-        RANDOM_START_TIME = UnityEngine.Random.Range(MIN_START_TIME, MAX_START_TIME);
-        idleTimer = timer = 0.0f;
+  
+        timer = 0.0f;
         questionCounter = 0;
         unreadCounter = 0;
         unreadIndex = UNREAD_INDEX;
@@ -104,6 +102,7 @@ public class WomenBehavior : MonoBehaviour
         formatNameIndex = 0;
         score = 0;
         isGameOver = false;
+        isFirstGetMinusAskTime = true;
     }
 
     // Update is called once per frame
@@ -111,14 +110,13 @@ public class WomenBehavior : MonoBehaviour
     {
         if (!isGameOver)
         {
+            timer += Time.deltaTime;
             if (hasAskQuestion)
             {
-                idleTimer += Time.deltaTime;
                 CheckIdle();
             }
             else
             {
-                timer += Time.deltaTime;
                 CheckAskQuestion();
             }
         }
@@ -133,6 +131,7 @@ public class WomenBehavior : MonoBehaviour
         matchData = matchs;
         InitQuestionList();
         InitResponseList();
+        randomStartTime = UnityEngine.Random.Range(MIN_START_TIME, (int)data.askTime);
     }
 
     public WomenInfo GetData()
@@ -204,25 +203,36 @@ public class WomenBehavior : MonoBehaviour
         isGameOver = true;
     }
 
-    public float GetTimer()
-    {
-        return timer;
-    }
-
-    public float GetIdleTimer()
-    {
-        return idleTimer;
-    }
-
     public bool GetHasAskQuestion()
     {
         return hasAskQuestion;
     }
+
+
+    public float GetAskTimeRatio()
+    {
+        if (timer < 0 && isFirstGetMinusAskTime)
+        {
+            isFirstGetMinusAskTime = false;
+            MINUS_TIME = -timer;
+        }
+        else if (timer >= 0 && !isFirstGetMinusAskTime)
+        {
+            isFirstGetMinusAskTime = true;
+        }
+
+        if (timer < 0 && !isFirstGetMinusAskTime)
+        {
+            return (timer + MINUS_TIME) / (data.askTime + MINUS_TIME);
+        }
+
+        return timer / data.askTime;
+    }
+
     //event
     public void OnPlayCardEvent(Card card)
     {
         hasAskQuestion = false;
-        timer = 0;
         playerCard = card;
         StartCoroutine(Response(RESPONSE_DELAY_TIME));
     }
@@ -282,7 +292,7 @@ public class WomenBehavior : MonoBehaviour
  
     }
 
-    void AddCoolDownTime(float time)//TODO?
+    void AddCoolDownTime(float time)
     {
         timer -= time;
     }
@@ -341,29 +351,30 @@ public class WomenBehavior : MonoBehaviour
 
     void CheckIdle()
     {
-        if (idleTimer > IDLE_TIME)
+        if (timer > data.askTime)
         {
             hasAskQuestion = false;
-            idleTimer = 0;
-            timer = ASK_QUESTION_TIME - AFTER_IDLE_DELAY_TIME;
+            timer = data.askTime - AFTER_IDLE_DELAY_TIME;
+            cantUseCardEvent?.Invoke(this, EventArgs.Empty);
             int responseId = idleResponseIdList[UnityEngine.Random.Range(0, idleResponseIdList.Count)];
             AddMessage(responseId, MessageType.WomenResponse);
-            AddScore(IDLE_SCORE);
+            AddScore(data.idleScore);
         }
     }
 
     void CheckAskQuestion()
     {
-        if (timer > RANDOM_START_TIME && questionCounter == 0)
+        if (timer > randomStartTime && questionCounter == 0)
         {
             hasAskQuestion = true;
+            timer = 0;
             AskStartQuestion();
         }
-        else if (timer > ASK_QUESTION_TIME)
+        else if (timer > data.askTime)
         {
             int index = UnityEngine.Random.Range(0, randomQuestionList.Count);
             hasAskQuestion = true;
-            idleTimer = 0;
+            timer = 0;
             AskQuestion(randomQuestionList[index]);
         }
     }
@@ -373,7 +384,7 @@ public class WomenBehavior : MonoBehaviour
     {
         yield return new WaitForSeconds(RESPONSE_DELAY_TIME);
         hasAskQuestion = true;
-        idleTimer = 0;
+        timer = 0;
         AskQuestion(id);
     }
 
@@ -396,7 +407,7 @@ public class WomenBehavior : MonoBehaviour
         {
             int responseId = wrongResponseIdList[UnityEngine.Random.Range(0, wrongResponseIdList.Count)];
             audioEvent?.Invoke(this, new AudioEventArgs(WomenResponseType.Wrong));
-            AddScore(WRONG_ANSWER_SCORE);
+            AddScore(data.wrongScore);
             AddMessage(responseId, MessageType.WomenResponse);
         }
     }

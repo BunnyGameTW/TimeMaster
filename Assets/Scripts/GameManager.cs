@@ -339,6 +339,14 @@ public class GameManager : MonoBehaviour
         cardObjectTransform.gameObject.SetActive(false);
     }
 
+    void OnCantUseCardEvent(object sender, EventArgs param)
+    {
+        if (womenIndex != NO_WOMEN_INDEX && (WomenBehavior)sender == GetTalkWomen())
+        {
+            SetCanUseCard(false);
+        }
+    }
+
     //private
     void InitWomenList()
     {
@@ -357,6 +365,7 @@ public class GameManager : MonoBehaviour
                 women.audioEvent += OnAudioEvent;
                 women.gameOverEvent += OnGameOverEvent;
                 women.changePitchEvent += OnChangePitchEvent;
+                women.cantUseCardEvent += OnCantUseCardEvent;
                 womenList.Add(women);
             }
         }

@@ -10,5 +10,9 @@ public class WomenInfo
     public string state;
     public string fileName;
     public string end;
+    public int idleScore;
+    public int wrongScore;
+    public float askTime;
+
 }
 

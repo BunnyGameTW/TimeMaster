@@ -55,16 +55,11 @@ public class ChatCellBehavior : MonoBehaviour
             }
         }
 
-        if (womenData.GetHasAskQuestion())
+        timeBarImage.fillAmount = 1.0f - womenData.GetAskTimeRatio();
+        Color barColor = womenData.GetHasAskQuestion() ? waitResponseColor : idleColor;
+        if (timeBarImage.color != barColor)
         {
-            timeBarImage.color = waitResponseColor;
-            timeBarImage.fillAmount = 1.0f - womenData.GetIdleTimer() / WomenBehavior.IDLE_TIME;
-        }
-        else
-        {
-            timeBarImage.color = idleColor;
-            timeBarImage.fillAmount = 1.0f - womenData.GetTimer() / WomenBehavior.ASK_QUESTION_TIME;
-
+            timeBarImage.color = barColor;
         }
     }
 
