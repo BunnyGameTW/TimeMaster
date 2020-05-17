@@ -308,8 +308,8 @@ public class GameManager : MonoBehaviour
 
     void OnGameOverEvent(object sender, EventArgs param)
     {
+        if (isGameOver) return;
         isGameOver = true;
-        
         WomenBehavior women = (WomenBehavior)sender;
         GameOver(women.GetData().id, GetScore());
     }
@@ -353,8 +353,8 @@ public class GameManager : MonoBehaviour
         womenList = new List<WomenBehavior>();
         for (int i = 0; i < excelData.womenTable.Count; i++)
         {
-            if (i < 2)//TODO removed
-            {
+            //if (i < 2)//TODO removed
+            //{
                 WomenBehavior women = Instantiate(womenPrefab).GetComponent<WomenBehavior>();
                 women.SetData(
                     excelData.womenTable[i],
@@ -367,7 +367,7 @@ public class GameManager : MonoBehaviour
                 women.changePitchEvent += OnChangePitchEvent;
                 women.cantUseCardEvent += OnCantUseCardEvent;
                 womenList.Add(women);
-            }
+            //}
         }
     }
 
@@ -757,7 +757,7 @@ public class GameManager : MonoBehaviour
             {
                 for (int i = 0; i < messages.Length; i++)
                 {
-                    StartCoroutine(ShowInRoomMessage(MULTIPLE_LINE_DELAY_TIME * i, messages, i, type));
+                    StartCoroutine(ShowInRoomMessage(MULTIPLE_LINE_DELAY_TIME * i, messages, i, type, GetTalkWomen()));
                 }
             }
             else
@@ -777,16 +777,26 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    IEnumerator ShowInRoomMessage(float waitTime, string [] messages, int i, MessageType type)
+    IEnumerator ShowInRoomMessage(float waitTime, string [] messages, int i, MessageType type, WomenBehavior women)
     {
         yield return new WaitForSeconds(waitTime);
-        AddWomenMessage(messages[i]);
-        UpdateChatList(GetTalkWomen(), messages[i], true);
-
-        if (i == messages.Length - 1 && type == MessageType.WomenQuestion)
+        if(womenIndex != women.GetData().id)
         {
-            SetCanUseCard(true);
+            StartCoroutine(ShowNewMessage(0, women, messages, i));
+            UpdateChatList(women, messages[i], false);
         }
+        else
+        {
+            AddWomenMessage(messages[i]);
+            UpdateChatList(women, messages[i], true);
+
+            if (i == messages.Length - 1 && type == MessageType.WomenQuestion)
+            {
+                SetCanUseCard(true);
+            }
+        }
+
+      
     }
 
     void ShowNewMessages(Message message, WomenBehavior women)
@@ -828,6 +838,7 @@ public class GameManager : MonoBehaviour
         //reorder list
         chatCell.gameObject.transform.SetAsFirstSibling();
     }
+
     void AddWomenMessage(string text)
     {
         Transform parent = roomScrollViewObject.GetComponentInChildren<ContentSizeFitter>().gameObject.transform;
@@ -888,8 +899,13 @@ public class GameManager : MonoBehaviour
         {
             item.SetGameOver();
         }
+        foreach (ChatCellBehavior item in chatList)
+        {
+            item.SetGameOver();
+        }
         Destroy(newMessageTransform.gameObject);
         roomSwipe.SetCanSwipe(false);
+       
 
         //TODO change in fail women room and show angry or show time
        

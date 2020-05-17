@@ -21,17 +21,19 @@ public class ChatCellBehavior : MonoBehaviour
     WomenBehavior womenData;
     float height;
     Vector3 originMousePosition;
-    bool hasDrag;
+    bool hasDrag, isGameOver;
 
     // Start is called before the first frame update
     void Start()
     {
-        hasDrag = false;
+        hasDrag = isGameOver = false;
         height = GetComponent<RectTransform>().sizeDelta.y;
     }
 
     void Update()
     {
+        if (isGameOver)
+            return;
         if (Input.GetMouseButtonDown(0))//TODO 寫個base
         {
             originMousePosition = Input.mousePosition;
@@ -77,6 +79,10 @@ public class ChatCellBehavior : MonoBehaviour
         return womenInfo;
     }
 
+    public void SetGameOver()
+    {
+        isGameOver = true;
+    }
     //update unread number and text
     public void UpdateUI(string text, int unreadNumber)
     {
