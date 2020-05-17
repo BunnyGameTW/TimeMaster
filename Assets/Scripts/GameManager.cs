@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
 using System;
 using TMPro;
 
@@ -66,6 +65,7 @@ public class GameManager : MonoBehaviour
     const float MULTIPLE_LINE_DELAY_TIME = 1.0f;
     const int MAX_IN_ROOM_TEXT_NUMBER = 20;
     float CARD_TOTAL_WIDTH;
+    int CARD_PROBABILITY_DENOMINATOR;
 
     List<Card> cardData;
 
@@ -78,7 +78,6 @@ public class GameManager : MonoBehaviour
     int womenIndex;
     bool isGameOver;
     float secondTime;
-    List<Card> randomCardList;
     List<GameObject> playerCards;
     Dictionary<State, GameObject> scrollViewDictionary;
     Dictionary<State, string> titleTextDictionary;
@@ -100,9 +99,13 @@ public class GameManager : MonoBehaviour
         secondTime = Mathf.Infinity;
         isChangePitch = isGameOver = false;
         cardData = excelData.cardTable;
+        for (int i = 0; i < cardData.Count; i++)
+        {
+            CARD_PROBABILITY_DENOMINATOR += cardData[i].probability;
+        }
+
         womenIndex = NO_WOMEN_INDEX;
         pitchLevel = -1;
-        randomCardList = new List<Card>();
         chatList = new List<ChatCellBehavior>();
         audioSource = GetComponent<AudioSource>();
         bgmAudioSource = Camera.main.GetComponent<AudioSource>();
@@ -121,7 +124,7 @@ public class GameManager : MonoBehaviour
         InitWomenList();
 
         CARD_TOTAL_WIDTH = playerCards[0].gameObject.GetComponentInChildren<RectTransform>().sizeDelta.x;
-
+      
         SwitchState();
     }
 
@@ -614,20 +617,21 @@ public class GameManager : MonoBehaviour
         return womenList[womenIndex - 1];
     }
 
-    //TODO 機率
     Card GetRandomCardData()
     {
-        if (randomCardList.Count == 0)
+        int index = UnityEngine.Random.Range(0, CARD_PROBABILITY_DENOMINATOR) + 1;
+        int numerator = 0;
+        for (int i = 0; i < cardData.Count; i++)
         {
-            for (int i = 0; i < cardData.Count; i++)
+            numerator += cardData[i].probability;
+            if(index <= numerator)
             {
-                randomCardList.Add(cardData[i]);
+                Card randomCard = cardData[i];
+                return randomCard;
             }
         }
-        int index = UnityEngine.Random.Range(0, randomCardList.Count);
-        Card randomCard = randomCardList[index];
-        randomCardList.RemoveAt(index);
-        return randomCard;
+
+        return null;
     }
 
     Card GetCardData(int id)
@@ -650,8 +654,6 @@ public class GameManager : MonoBehaviour
         gameObject.GetComponent<CardBehavior>().pointerEnterEvent += OnCardEnterEvent;
         gameObject.GetComponent<CardBehavior>().pointerExitEvent += OnCardExitEvent;
         gameObject.GetComponent<CardBehavior>().pointerUpEvent += OnCardPointerUpEvent;
-
-        
         return gameObject;
     }
 
@@ -873,7 +875,6 @@ public class GameManager : MonoBehaviour
 
     void GameOver(int id, int score)
     {
-
         foreach (WomenBehavior item in womenList)
         {
             item.SetGameOver();
@@ -882,8 +883,6 @@ public class GameManager : MonoBehaviour
         roomSwipe.SetCanSwipe(false);
 
         //TODO change in fail women room and show angry or show time
-        //end object fade in
-        //
        
         Animation ani = endFadeImage.GetComponent<Animation>();
         ani.Play();
@@ -905,6 +904,7 @@ public class GameManager : MonoBehaviour
         endText.text = id == NO_WOMEN_INDEX ? HAPPY_END_STRING : excelData.womenTable[id - 1].end;
         scoreText.text = charName + "結局：\n" + string.Format(scoreText.text, score);
     }
+
     IEnumerator ShowEnd(float time)
     {
         yield return new WaitForSeconds(time);

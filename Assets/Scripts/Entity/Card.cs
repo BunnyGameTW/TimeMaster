@@ -7,9 +7,10 @@ public class Card
     public CardType type;
     public string description;
     public string fileName;
+    public int probability;
 }
 
 public enum CardType
 {
-    Text,Image
+    Text, Image
 }

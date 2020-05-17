@@ -14,7 +14,7 @@ public class RoomSwipe : MonoBehaviour
     const float ORIGIN_POSITION_X = 9999.0f;
     float originMousePositionX, originMousePositionY;
     float targetX;
-    bool isMove, hasPointerDown, canSwipe, needInvokeEvent, isSwipe;
+    bool isMove, hasPointerDown, canSwipe, needInvokeEvent;
 
     public event EventHandler<EventArgs> moveEndEvent;
     public event EventHandler<EventArgs> hideCardEvent;
@@ -28,7 +28,6 @@ public class RoomSwipe : MonoBehaviour
         originMousePositionX = ORIGIN_POSITION_X;
         canSwipe = false;
         needInvokeEvent = true;
-        isSwipe = false;
     }
 
     // Update is called once per frame
@@ -89,7 +88,6 @@ public class RoomSwipe : MonoBehaviour
             }
             else
             {
-                Debug.Log("moveEndEvent");
                 moveEndEvent?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -99,7 +97,6 @@ public class RoomSwipe : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Input.GetMouseButtonDown(0)");
             float min = -SCREEN_WIDTH / 2;
             float max = SCREEN_WIDTH / 2;
             transform.localPosition = new Vector3(min, 0, 0);
@@ -119,7 +116,6 @@ public class RoomSwipe : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            Debug.Log("Input.GetMouseButtonUp(0)");
             float offsetX = Mathf.Abs(Input.mousePosition.x - originMousePositionX);
             float offsetY = Mathf.Abs(Input.mousePosition.y - originMousePositionY);
             if (offsetY > offsetX || (offsetX == 0 && offsetY == 0))
@@ -143,14 +139,12 @@ public class RoomSwipe : MonoBehaviour
             float offsetY = Mathf.Abs(Input.mousePosition.y - originMousePositionY);
             if (offset >= MIN_DRAG_OFFSET && offset > offsetY && Input.mousePosition.x - Screen.width / 2 >= 0)
             {
-                isSwipe = true;
                 transform.localPosition = new Vector3(Input.mousePosition.x - Screen.width / 2, 0, 0);
                 roomScrollView.transform.localPosition = new Vector3(
                     Input.mousePosition.x - Screen.width / 2,
                     roomScrollView.transform.localPosition.y,
                     0
                 );
-
             }
         }
     }

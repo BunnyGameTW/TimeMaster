@@ -55,7 +55,7 @@ MonoBehaviour:
     nextQuestionId: 0
   - womenId: 1
     questionId: 1
-    cardId: 38
+    cardId: 39
     responseId: 48
     cdTime: 0
     addScore: 0
@@ -4936,175 +4936,262 @@ MonoBehaviour:
     description: "\u4F60\u6700\u8FD1\u8B8A\u5F97\u5F88\u5C11\u8AAA\u8A71\u6B38\n\u600E\u9EBC\u4E86"
     formatNumber: 0
     hasMuitipleLine: 0
+  - id: 27
+    type: 0
+    description: "\u8001\u5927\uFF0C\u9084\u5728\u7761\u55CE"
+    formatNumber: 0
+    hasMuitipleLine: 0
+  - id: 28
+    type: 0
+    description: "\u8001\u5927\uFF0C\u4ECA\u5929\u6709\u5F88\u591A\u884C\u7A0B\uFF0C\u6211\u5728\u8001\u5730\u65B9\u7B49\u4F60"
+    formatNumber: 0
+    hasMuitipleLine: 0
+  - id: 29
+    type: 0
+    description: "\u8001\u5927\uFF0C\u4F60\u5728\u54EA"
+    formatNumber: 0
+    hasMuitipleLine: 0
+  - id: 30
+    type: 2
+    description: "\u4ECA\u5929\u8981\u4E0D\u8981\u53BB\u653E\u9B06\u4E00\u4E0B"
+    formatNumber: 0
+    hasMuitipleLine: 0
+  - id: 31
+    type: 2
+    description: "\u9019\u500B\u5468\u672B\u6C92\u5B89\u6392\u4E8B\u60C5\u8036\uFF0C\u662F\u4E0D\u662F\u8A72\u4F86\u4E00\u4E0B\u4E86"
+    formatNumber: 0
+    hasMuitipleLine: 0
+  - id: 32
+    type: 2
+    description: "\u7A81\u7136\u597D\u60F3\u904B\u52D5\u5594\n\u4F60\u6709\u7A7A\u55CE"
+    formatNumber: 0
+    hasMuitipleLine: 1
+  - id: 33
+    type: 1
+    description: "\u4F60\u662F\u4E0D\u662F\u4E0D\u611B\u6211\u4E86"
+    formatNumber: 0
+    hasMuitipleLine: 0
+  - id: 34
+    type: 2
+    description: "\u6211\u4E0D\u8212\u670D\uFF0C\u9700\u8981\u4F60\u7684\u95DC\u5FC3"
+    formatNumber: 0
+    hasMuitipleLine: 0
+  - id: 35
+    type: 1
+    description: "{0}\u5BEB\u4FE1\u8DDF\u6211\u8AAA\u4F60\u548C\u5973\u7C89\u7D72\u641E\u5728\u4E00\u8D77\uFF0C\u8ACB\u89E3\u91CB"
+    formatNumber: 1
+    hasMuitipleLine: 0
   cardTable:
   - id: 1
     type: 0
     description: "\u6211\u611B\u4F60"
     fileName: 0
+    probability: 50
   - id: 2
     type: 0
     description: "\u6211\u8981\u53BB\u6D17\u6FA1\u4E86"
     fileName: 0
+    probability: 35
   - id: 3
     type: 0
     description: "\u525B\u8D77\u5E8A"
     fileName: 0
+    probability: 30
   - id: 4
     type: 0
     description: "\u525B\u525B\u5728\u8DDF\u7D93\u7D00\u4EBA\u8A0E\u8AD6\u4E8B\u60C5"
     fileName: 0
+    probability: 40
   - id: 5
     type: 0
     description: "\u4F60\u8981\u662F\u9019\u9EBC\u60F3\uFF0C\u6211\u4E5F\u4E0D\u8AAA\u4EC0\u9EBC\u4E86\u3002"
     fileName: 0
+    probability: 15
   - id: 6
     type: 0
     description: "\u80FD\u4E0D\u80FD\u4E0D\u8981\u903C\u6211\u4E86\uFF0C\u7D66\u6211\u4E00\u9EDE\u6642\u9593\u597D\u4E0D\u597D\u3002"
     fileName: 0
+    probability: 23
   - id: 7
     type: 0
     description: "\u5979\u53EA\u662F\u6211\u9AD8\u4E2D\u540C\u5B78\uFF0C\u4F60\u5225\u60F3\u591A\u4E86\u3002"
     fileName: 0
+    probability: 23
   - id: 8
     type: 0
     description: "\u6700\u8FD1\u771F\u7684\u5F88\u5FD9\u3002"
     fileName: 0
+    probability: 23
   - id: 9
     type: 0
     description: "\u6211\u65E9\u5C31\u4E0D\u611B\u4F60\u4E86\uFF0C\u53EA\u662F\u4E0D\u77E5\u9053\u600E\u9EBC\u548C\u4F60\u8AAA\u3002"
     fileName: 0
+    probability: 20
   - id: 10
     type: 0
     description: "\u6211\u53EA\u662F\u592A\u885D\u52D5\u4E86\uFF0C\u6C92\u6709\u63A7\u5236\u597D\u81EA\u5DF2\u624D\u52D5\u7684\u624B\u3002"
     fileName: 0
+    probability: 23
   - id: 11
     type: 0
     description: "\u6211\u5ABD\u4E0D\u540C\u610F\u6211\u5011\u5728\u4E00\u8D77\u3002"
     fileName: 0
+    probability: 10
   - id: 12
     type: 0
     description: "\u4F60\u662F\u4E00\u500B\u597D\u5973\u5B69\uFF0C\u4F46\u6211\u5011\u4E0D\u80FD\u5728\u4E00\u8D77\u3002"
     fileName: 0
+    probability: 23
   - id: 13
     type: 0
     description: "\u6211\u8DDF\u5979\u53EA\u662F\u73A9\u73A9\u800C\u5DF2\uFF0C\u958B\u73A9\u7B11\u7684\uFF0C\u4F60\u5225\u7576\u771F\u3002"
     fileName: 0
+    probability: 40
   - id: 14
     type: 0
     description: "\u6211\u914D\u4E0D\u4E0A\u4F60\u3002"
     fileName: 0
+    probability: 10
   - id: 15
     type: 0
     description: "\u4F60\u89BA\u5F97\u662F\u5C31\u662F\u5427\u3002"
     fileName: 0
+    probability: 16
   - id: 16
     type: 0
     description: "\u4E0D\u90FD\u662F\u4F60\u81EA\u9858\u7684\u55CE\uFF1F"
     fileName: 0
+    probability: 20
   - id: 17
     type: 0
     description: "\u4F60\u548C\u5225\u7684\u5973\u751F\u4E0D\u4E00\u6A23\uFF0C\u7B2C\u4E00\u773C\u5C31\u5F88\u8212\u670D\u3002"
     fileName: 0
+    probability: 18
   - id: 18
     type: 0
     description: "\u6211\u5C0D\u5F85\u611F\u60C5\u90FD\u6C92\u8A8D\u771F\u904E\uFF0C\u76F4\u5230\u9047\u5230\u4F60\u3002"
     fileName: 0
+    probability: 17
   - id: 19
     type: 0
     description: "\u4E4B\u524D\u6C92\u89BA\u5F97\uFF0C\u6162\u6162\u7684\u767C\u73FE\u6211\u5011\u771F\u7684\u4E0D\u5408\u9069\u3002"
     fileName: 0
+    probability: 5
   - id: 20
     type: 0
     description: "\u6211\u90FD\u5DF2\u7D93\u9053\u6B49\u4E86\u4F60\u9084\u8981\u600E\u6A23"
     fileName: 0
+    probability: 19
   - id: 21
     type: 0
     description: "\u6211\u6703\u5C0D\u4F60\u8CA0\u8CAC\u7684"
     fileName: 0
+    probability: 23
   - id: 22
     type: 0
     description: "\u6211\u932F\u4E86\u884C\u5427"
     fileName: 0
+    probability: 23
   - id: 23
     type: 0
     description: "\u6211\u8DDF\u5979\u53EA\u662F\u670B\u53CB"
     fileName: 0
+    probability: 23
   - id: 24
     type: 0
     description: "\u6211\u9019\u6BB5\u6642\u9593\u6709\u9EDE\u5FD9\u6240\u4EE5\u6C92\u7406\u4F60"
     fileName: 0
+    probability: 23
   - id: 25
     type: 0
     description: "\u5176\u5BE6\u5462\uFF0C\u6211\u53EA\u662F\u60F3\u8B93\u5927\u5BB6\u90FD\u5F97\u5230\u5E78\u798F\u3002"
     fileName: 0
+    probability: 23
   - id: 26
     type: 0
     description: "\u6211\u767C\u8A93\uFF0C\u53EA\u611B\u4F60\u4E00\u500B"
     fileName: 0
+    probability: 40
   - id: 27
     type: 0
     description: "\u6211\u8DDF\u5979\u4E4B\u9593\u4EC0\u9EBC\u4E5F\u6C92\u6709\uFF0C\u5C31\u662F\u770B\u5979\u53EF\u6190"
     fileName: 0
+    probability: 23
   - id: 28
     type: 0
     description: "\u6211\u4FDD\u8B49\u4E0D\u6703\u6709\u4E0B\u4E00\u6B21\u4E86\uFF01"
     fileName: 0
+    probability: 23
   - id: 29
     type: 0
     description: "\u6211\u8DDF\u5979\u53EA\u662F\u73A9\u73A9\uFF0C\u6700\u611B\u7684\u4E00\u76F4\u90FD\u662F\u4F60"
     fileName: 0
+    probability: 23
   - id: 30
     type: 0
     description: "\u4F60\u7CBE\u795E\u6709\u554F\u984C\uFF0C\u624D\u6703\u61F7\u7591\u6211\u5916\u9047"
     fileName: 0
+    probability: 15
   - id: 31
     type: 0
     description: "\u4F60\u5230\u5E95\u628A\u6211\u7576\u4EC0\u9EBC\uFF1F\u6211\u5011\u4E4B\u9593\u7684\u4FE1\u4EFB\u5C31\u53EA\u6709\u9019\u6A23\u55CE\uFF1F"
     fileName: 0
+    probability: 10
   - id: 32
     type: 0
     description: "\u6C92\u554F\u984C\uFF0C\u4EA4\u7D66\u6211"
     fileName: 0
+    probability: 30
   - id: 33
     type: 0
     description: "\u6211\u89BA\u5F97\u4F60\u63A5\u8FD1\u6211\u5C31\u662F\u70BA\u4E86\u5BB3\u6211\uFF0C\u5BB3\u5F97\u6211\u597D\u559C\u6B61\u4F60\u3002"
     fileName: 0
+    probability: 23
   - id: 34
     type: 0
     description: "\u4F60\u8AAA\u7684\u6C92\u932F"
     fileName: 0
+    probability: 23
   - id: 35
     type: 0
     description: OK
     fileName: 0
+    probability: 23
   - id: 36
     type: 0
     description: "\u6069\u6069"
     fileName: 0
+    probability: 23
   - id: 37
     type: 0
     description: "\u4F60\u4E0D\u7BA1\u600E\u6A23\u90FD\u662F\u5C0D\u7684\uFF0C\u6211\u7684\u516C\u4E3B"
     fileName: 0
+    probability: 30
   - id: 38
     type: 0
     description: "\u6211\u8981\u8B93\u4F60\u8B8A\u6210\u6211\u7684\u5F62\u72C0"
     fileName: 0
+    probability: 23
   - id: 39
     type: 0
     description: "\u5728\u5FD9\u8457\u60F3\u4F60"
     fileName: 0
+    probability: 40
   - id: 40
     type: 0
     description: "\u7576\u7136\u4E86\uFF0C\u6211\u6703\u7D66\u4F60\u4E00\u500B\u5927\u9A5A\u559C"
     fileName: 0
+    probability: 23
   - id: 41
     type: 0
     description: "\u6211\u559C\u6B61\u4F60\u6240\u6709\u4E00\u5207"
     fileName: 0
+    probability: 23
   - id: 42
     type: 0
     description: "\u6211\u5FD9\u8457\u5DE5\u4F5C"
     fileName: 0
+    probability: 30
   responseTable:
   - id: 1
     type: 1
@@ -5358,6 +5445,9 @@ MonoBehaviour:
     state: "\u6700\u65B0\u5C08\u8F2F\u71B1\u8CE3\u4E2D\uFF0C\u8ACB\u5927\u5BB6\u591A\u591A\u652F\u6301"
     fileName: women_1
     end: "\u4F60\u88AB\u516C\u958B\u5206\u624B\u4FE1\n\u88AB\u7DB2\u53CB\u64BB\u4F10\n\u8077\u696D\u751F\u6DAF\u5D29\u6F70"
+    idleScore: 25
+    wrongScore: 20
+    askTime: 10
   - id: 2
     name: "\u8DF3\u8DF3<3"
     personality: "\u6D3B\u6F51"
@@ -5365,6 +5455,9 @@ MonoBehaviour:
     state: "\u597D\u7121\u804A\u554A~"
     fileName: women_2
     end: "\u4F60\u5728B\u5361\u4E0A\u88AB\u63ED\u9732\n\u5EE3\u70BA\u6D41\u50B3"
+    idleScore: 20
+    wrongScore: 15
+    askTime: 8
   - id: 3
     name: "\u6B63\u7D93"
     personality: "\u51B7\u975C"
@@ -5372,6 +5465,9 @@ MonoBehaviour:
     state: "\u5408\u4F5C\u901A\u544A\u8ACB\u4F86\u4FE1\u6D3D\u8AC7\uFF1Atimemaster@bunnygame.com"
     fileName: women_3
     end: "\u4F60\u88AB\u72D7\u4ED4\u6293\u5230\n\u8077\u696D\u751F\u6DAF\u5D29\u6F70"
+    idleScore: 27
+    wrongScore: 22
+    askTime: 12
   - id: 4
     name: "\u5927\u59CA"
     personality: "\u706B\u7206"
@@ -5379,6 +5475,9 @@ MonoBehaviour:
     state: rock!
     fileName: women_4
     end: "\u4F60\u88AB\u8B8A\u6210\u6D88\u6CE2\u584A\n\u81F3\u4ECA\u4ECD\u70BA\u6211\u5011\u5B88\u8B77\u6D77\u5CB8\u7DDA"
+    idleScore: 45
+    wrongScore: 40
+    askTime: 15
   - id: 5
     name: "\u963F\u723E\u6CD5"
     personality: "\u75C5\u5B0C"
@@ -5386,6 +5485,9 @@ MonoBehaviour:
     state: "\u563F\u563F\u563F \u5225\u88AB\u6211\u902E\u5230"
     fileName: women_5
     end: "\u4F60\u88AB\u89E3\u5256\u5F8C\n\u6536\u85CF\u5728\u91AB\u751F\u5BB6\n\u71D2\u74F6\u4E2D\u7684\u8C6C\u982D"
+    idleScore: 22
+    wrongScore: 17
+    askTime: 9
   - id: 6
     name: "\u7D50\u5B50"
     personality: "\u60B2\u89C0\u3001\u9670\u6C89\u3001\u795E\u7D93\u8CEA"
@@ -5393,6 +5495,9 @@ MonoBehaviour:
     state: "\u5438\u8C93\u5927\u6CD5\u597D~"
     fileName: women_6
     end: "\u51FA\u4E86\u6F2B\u756B\u65B0\u4F5C-\u6E23\u7537\u8A18\n\u756B\u5B8C\u5C31\u81EA\u6BBA\u4E86"
+    idleScore: 16
+    wrongScore: 11
+    askTime: 6
   - id: 7
     name: "\u963F\u7F8E"
     personality: "\u8272\u60C5"
@@ -5400,6 +5505,9 @@ MonoBehaviour:
     state: "\u963F\u7F8E\u5C0F\u5403\u5E97\u5468\u4E00\u516C\u4F11"
     fileName: women_7
     end: "\u963F\u7F8E\u627E\u75C5\u4EBA\u8B93\u4F60\u67D3\u75C5\n\u5931\u53BB\u6027\u529F\u80FD"
+    idleScore: 26
+    wrongScore: 21
+    askTime: 10
   - id: 8
     name: "\u4F0A\u8389\u838E\u767D\xB7\u67EF\u8482\u5229\u4E9E\xB7\u7C73\u591A\u798F\u7279"
     personality: "\u5BB3\u7F9E"
@@ -5410,6 +5518,9 @@ MonoBehaviour:
     fileName: women_8
     end: "\u4F60\u88AB\u9ED1\u6389\n\u6C92\u843D\u5F8C\n\u88AB\u6293\u53BB\u83CA\u82B1\u6B98
       \u6EFF\u5730\u50B7"
+    idleScore: 100
+    wrongScore: 60
+    askTime: 20
   - id: 9
     name: "\u60C5\u5831\u54E1"
     personality: "\u7406\u6027\u3001\u7F3A\u4E4F\u81EA\u4FE1\u7684"
@@ -5417,3 +5528,6 @@ MonoBehaviour:
     state: "TBBS\u7279\u6D3E\u54E1\uFF0C\u8CE3\u7368\u5BB6\u982D\u689D"
     fileName: women_9
     end: "\u4F60\u591A\u4EBA\u904B\u52D5\u7D04\u5230\u6276\u4ED6\n\u88AB\u809B\u4E86\u7136\u5F8C\u88AB\u73A9\u58DE"
+    idleScore: 30
+    wrongScore: 25
+    askTime: 13
