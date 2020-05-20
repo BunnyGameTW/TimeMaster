@@ -921,7 +921,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            fileName = id > 2 ? "to_be_continue" : string.Format("end_{0}", id);
+            fileName = id > 2 ? "end_0" : string.Format("end_{0}", id);
         }
 
         string charName = id == NO_WOMEN_INDEX ? "大師" : womenList[id - 1].GetData().name;
