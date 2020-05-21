@@ -17,7 +17,6 @@ public class ChatCellBehavior : MonoBehaviour
     public Color waitResponseColor;
     const int MAX_TEXT_LENGTH = 24;
 
-    Text testText, testText2, testText3;//TPD
     WomenInfo womenInfo;
     WomenBehavior womenData;
     float height;
@@ -25,29 +24,15 @@ public class ChatCellBehavior : MonoBehaviour
     bool hasDrag, isGameOver;
     const float DEFAULT_SCREEN_HEIGHT = 1920.0f;
     const float MIN_DRAG_DISTANCE = 50.0f;
-    // Start is called before the first frame update
+
     void Start()
     {
         hasDrag = isGameOver = false;
-
-        //Debug.Log(Screen.height / DEFAULT_SCREEN_HEIGHT);
         height = GetComponent<RectTransform>().sizeDelta.y * (Screen.height / DEFAULT_SCREEN_HEIGHT);
-        //Debug.Log("height1-> " + GetComponent<RectTransform>().sizeDelta.y);
-        //Debug.Log("height->" + height);
-
-        //testText = GameObject.Find("testText").GetComponent<Text>();
-        //testText2 = GameObject.Find("testText2").GetComponent<Text>();
-        //testText3 = GameObject.Find("testText3").GetComponent<Text>();
-
     }
 
     void Update()
     {
-
-
-        //testText.text = hasDrag ? "true" : "false";
-        //testText2.text = Input.touchCount == 1 ? Input.GetTouch(0).phase.ToString() : "None";
-        //testText3.text = Vector3.Distance(Input.mousePosition, originMousePosition).ToString();
         if (isGameOver)
             return;
 # if UNITY_EDITOR	
@@ -114,6 +99,7 @@ public class ChatCellBehavior : MonoBehaviour
     {
         isGameOver = true;
     }
+
     //update unread number and text
     public void UpdateUI(string text, int unreadNumber)
     {
