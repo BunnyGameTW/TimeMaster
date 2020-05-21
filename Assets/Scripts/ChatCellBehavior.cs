@@ -35,7 +35,7 @@ public class ChatCellBehavior : MonoBehaviour
     {
         if (isGameOver)
             return;
-# if UNITY_EDITOR	
+# if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
         if (Input.GetMouseButtonDown(0))//TODO 寫個base
         {
 #else
@@ -55,7 +55,7 @@ public class ChatCellBehavior : MonoBehaviour
             }
             hasDrag = false;
         }
-# if UNITY_EDITOR	
+# if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
         else if (Input.GetMouseButton(0))
         {
             if (Input.mousePosition != originMousePosition && !hasDrag)

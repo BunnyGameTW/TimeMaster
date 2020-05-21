@@ -29,7 +29,7 @@ public class FriendCellBehavior : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
         if (Input.GetMouseButtonDown(0))//TODO 寫個base
         {
 #else
@@ -49,7 +49,7 @@ public class FriendCellBehavior : MonoBehaviour
             }
              hasDrag = false;
         }
-# if UNITY_EDITOR	
+# if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
         else if (Input.GetMouseButton(0))
         {
             if (Input.mousePosition != originMousePosition && !hasDrag)
