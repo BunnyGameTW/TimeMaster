@@ -441,7 +441,7 @@ MonoBehaviour:
     linkCount: 0
     lineCount: 1
     pageCount: 1
-    materialCount: 2
+    materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
@@ -606,6 +606,7 @@ MonoBehaviour:
   timeBarImage: {fileID: 1108321313815545004}
   idleColor: {r: 0.4716981, g: 0.4716981, b: 0.4716981, a: 1}
   waitResponseColor: {r: 0.9811321, g: 0.47668213, b: 0.47668213, a: 1}
+  testText: {fileID: 0}
 --- !u!1 &7649823679463359318
 GameObject:
   m_ObjectHideFlags: 0
@@ -892,7 +893,7 @@ MonoBehaviour:
     spaceCount: 0
     wordCount: 5
     linkCount: 0
-    lineCount: 2
+    lineCount: 1
     pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0

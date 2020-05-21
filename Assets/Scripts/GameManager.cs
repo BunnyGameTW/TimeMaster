@@ -353,7 +353,7 @@ public class GameManager : MonoBehaviour
         womenList = new List<WomenBehavior>();
         for (int i = 0; i < excelData.womenTable.Count; i++)
         {
-            //if (i < 2)//TODO removed
+            //if (i < 1)//TODO removed
             //{
                 WomenBehavior women = Instantiate(womenPrefab).GetComponent<WomenBehavior>();
                 women.SetData(

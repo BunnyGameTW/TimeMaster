@@ -15,19 +15,27 @@ public class FriendCellBehavior : MonoBehaviour
     bool hasDrag;
     float height;
     Vector3 originMousePosition;
+    const float DEFAULT_SCREEN_HEIGHT = 1920.0f;
+    const float MIN_DRAG_DISTANCE = 50.0f;
 
     // Start is called before the first frame update
     void Start()
     {
         hasDrag = false;
-        height = GetComponent<RectTransform>().sizeDelta.y;
+        height = GetComponent<RectTransform>().sizeDelta.y * (Screen.height / DEFAULT_SCREEN_HEIGHT);
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+#if UNITY_EDITOR
+        if (Input.GetMouseButtonDown(0))//TODO 寫個base
         {
+#else
+        if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+#endif
             originMousePosition = Input.mousePosition;
         }
         else if (Input.GetMouseButtonUp(0))
@@ -41,13 +49,24 @@ public class FriendCellBehavior : MonoBehaviour
             }
              hasDrag = false;
         }
+# if UNITY_EDITOR	
         else if (Input.GetMouseButton(0))
         {
-            if(Input.mousePosition != originMousePosition && !hasDrag)
+            if (Input.mousePosition != originMousePosition && !hasDrag)
+            {
+                hasDrag = true;
+            }
+
+        }
+#else
+        else if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved)
+        {
+            if (Mathf.Abs(Vector3.Distance(Input.mousePosition, originMousePosition)) > MIN_DRAG_DISTANCE && !hasDrag)
             {
                 hasDrag = true;
             }
         }
+#endif
     }
 
     public void SetData(WomenInfo womenInfo)

@@ -17,25 +17,46 @@ public class ChatCellBehavior : MonoBehaviour
     public Color waitResponseColor;
     const int MAX_TEXT_LENGTH = 24;
 
+    Text testText, testText2, testText3;//TPD
     WomenInfo womenInfo;
     WomenBehavior womenData;
     float height;
     Vector3 originMousePosition;
     bool hasDrag, isGameOver;
-
+    const float DEFAULT_SCREEN_HEIGHT = 1920.0f;
+    const float MIN_DRAG_DISTANCE = 50.0f;
     // Start is called before the first frame update
     void Start()
     {
         hasDrag = isGameOver = false;
-        height = GetComponent<RectTransform>().sizeDelta.y;
+
+        //Debug.Log(Screen.height / DEFAULT_SCREEN_HEIGHT);
+        height = GetComponent<RectTransform>().sizeDelta.y * (Screen.height / DEFAULT_SCREEN_HEIGHT);
+        //Debug.Log("height1-> " + GetComponent<RectTransform>().sizeDelta.y);
+        //Debug.Log("height->" + height);
+
+        //testText = GameObject.Find("testText").GetComponent<Text>();
+        //testText2 = GameObject.Find("testText2").GetComponent<Text>();
+        //testText3 = GameObject.Find("testText3").GetComponent<Text>();
+
     }
 
     void Update()
     {
+
+
+        //testText.text = hasDrag ? "true" : "false";
+        //testText2.text = Input.touchCount == 1 ? Input.GetTouch(0).phase.ToString() : "None";
+        //testText3.text = Vector3.Distance(Input.mousePosition, originMousePosition).ToString();
         if (isGameOver)
             return;
+# if UNITY_EDITOR	
         if (Input.GetMouseButtonDown(0))//TODO 寫個base
         {
+#else
+        if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+#endif
             originMousePosition = Input.mousePosition;
         }
         else if (Input.GetMouseButtonUp(0))
@@ -49,14 +70,24 @@ public class ChatCellBehavior : MonoBehaviour
             }
             hasDrag = false;
         }
+# if UNITY_EDITOR	
         else if (Input.GetMouseButton(0))
         {
             if (Input.mousePosition != originMousePosition && !hasDrag)
             {
                 hasDrag = true;
             }
+            
         }
-
+#else
+        else if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved)
+        {
+            if (Mathf.Abs(Vector3.Distance(Input.mousePosition, originMousePosition)) > MIN_DRAG_DISTANCE && !hasDrag)
+            {
+                hasDrag = true;
+            }
+        }
+#endif
         timeBarImage.fillAmount = 1.0f - womenData.GetAskTimeRatio();
         Color barColor = womenData.GetHasAskQuestion() ? waitResponseColor : idleColor;
         if (timeBarImage.color != barColor)

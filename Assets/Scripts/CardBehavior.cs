@@ -15,7 +15,7 @@ public class CardBehavior : MonoBehaviour
     public Image image;
     public Color activeColor;
     const float MOVE_OFFSET_Y = 100.0f;
-    const float PLAY_CARD_POSITION_Y = 0;
+    const float PLAY_CARD_POSITION_Y = -550.0f;
     const float SCALE_RATIO = 1.5f;
 
     Card data;
