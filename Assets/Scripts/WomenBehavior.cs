@@ -258,11 +258,11 @@ public class WomenBehavior : MonoBehaviour
     {
         foreach (WomenResponse item in responseData)
         {
-            if(item.type == WomenResponseType.Idle)
+            if (item.type == WomenResponseType.Idle && (item.womenId == data.id || item.womenId == 0))
             {
                 idleResponseIdList.Add(item.id);
             }
-            else if(item.type == WomenResponseType.Wrong)
+            else if(item.type == WomenResponseType.Wrong && (item.womenId == data.id || item.womenId == 0))
             {
                 wrongResponseIdList.Add(item.id);
             }
