@@ -101,6 +101,8 @@ public class CardBehavior : MonoBehaviour
 
     public void OnPointerDrag()
     {
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
+#else
         if (canUse)
         {
             if (hasPointerDown)
@@ -108,13 +110,18 @@ public class CardBehavior : MonoBehaviour
                 transform.position = Input.mousePosition;
             }
         }
+#endif
     }
 
     public void OnPointerUp()
     {
         if (canUse)
         {
+#if UNITY_EDITOR || UNITY_STANDALONE || UNITY_WEBGL
+            if (hasPointerDown && hasPointerEnter)
+#else
             if (transform.localPosition.y > PLAY_CARD_POSITION_Y && hasPointerDown && hasPointerEnter)
+#endif
             {
                 CardEventArgs param = new CardEventArgs();
                 param.cardData = data;
