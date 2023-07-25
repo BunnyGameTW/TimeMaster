@@ -1,8 +1,8 @@
 # Time Master
-👉Introduction👈  
+【Introduction】  
 Hang out with girls
 
-✏️Dev log✏️  
+【Dev log】  
 https://bunnygame.tw/time-master/
 
 ![](imagePath)
